@@ -1,14 +1,15 @@
 import { AIMessage, HumanMessage } from "@langchain/core/messages";
-import { isLangChainAvailable } from "@/lib/langchain";
+import { isLangChainAvailable, prepareImageForAgent } from "@/lib/langchain";
 import { lisualAgent } from "@/lib/langchain/agent";
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 type MessageRole = "user" | "assistant";
 
+/** imageDataUrl: ya normalizada por prepareImageForAgent (data:image/...;base64,...). */
 function buildMessages(
   messages: { role: MessageRole; content: string }[],
-  imageBase64?: string | null
+  imageDataUrl?: string | null
 ): (InstanceType<typeof HumanMessage> | InstanceType<typeof AIMessage>)[] {
   const out: (InstanceType<typeof HumanMessage> | InstanceType<typeof AIMessage>)[] = [];
   for (let i = 0; i < messages.length; i++) {
@@ -18,13 +19,12 @@ function buildMessages(
       continue;
     }
     const isLastUser = msg.role === "user" && i === messages.length - 1;
-    if (msg.role === "user" && isLastUser && imageBase64?.trim()) {
-      const dataUrl = imageBase64.startsWith("data:") ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`;
+    if (msg.role === "user" && isLastUser && imageDataUrl) {
       out.push(
         new HumanMessage({
           content: [
             { type: "text", text: msg.content || "¿Qué hay en esta imagen?" },
-            { type: "image_url", image_url: { url: dataUrl } },
+            { type: "image_url", image_url: { url: imageDataUrl } },
           ],
         })
       );
@@ -44,7 +44,7 @@ export const maxDuration = 60;
  * POST /api/agent
  * Body: { messages: { role: "user" | "assistant", content: string }[], imageBase64?: string }
  * - messages: historial de conversación (el último puede ser el mensaje actual).
- * - imageBase64: si se envía, se adjunta a la última entrada "user" como imagen (OCR/visión).
+ * - imageBase64: imagen en base64, data URL (data:image/...;base64,...) o URL pública. Se normaliza en backend para el modelo de visión.
  * Responde con el último mensaje del asistente y el historial actualizado.
  */
 export async function POST(request: NextRequest) {
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const rawMessages = Array.isArray(body?.messages) ? body.messages : [];
-    const imageBase64 = typeof body?.imageBase64 === "string" ? body.imageBase64 : null;
+    const imageInput = typeof body?.imageBase64 === "string" ? body.imageBase64 : null;
 
     const typed = rawMessages.filter(
       (m: unknown): m is { role: MessageRole; content: string } =>
@@ -74,20 +74,21 @@ export async function POST(request: NextRequest) {
         "content" in m &&
         typeof (m as { content: unknown }).content === "string"
     );
-    if (typed.length === 0 && !imageBase64) {
+    if (typed.length === 0 && !imageInput) {
       return NextResponse.json(
         { error: "Envía al menos un mensaje en 'messages' o una imagen en 'imageBase64'." },
         { status: 400 }
       );
     }
 
-    const messages = buildMessages(typed, imageBase64);
-    if (messages.length === 0 && imageBase64) {
+    const imageDataUrl = imageInput ? await prepareImageForAgent(imageInput) : null;
+    const messages = buildMessages(typed, imageDataUrl);
+    if (messages.length === 0 && imageDataUrl) {
       messages.push(
         new HumanMessage({
           content: [
             { type: "text", text: "¿Qué hay en esta imagen?" },
-            { type: "image_url", image_url: { url: imageBase64.startsWith("data:") ? imageBase64 : `data:image/jpeg;base64,${imageBase64}` } },
+            { type: "image_url", image_url: { url: imageDataUrl } },
           ],
         })
       );

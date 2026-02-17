@@ -12,9 +12,11 @@ import {
 } from "@/components/ui/dialog";
 import { LeadForm } from "@/components/forms/lead-form";
 import { createLead } from "@/lib/actions/leads";
+import { useRole } from "@/components/dashboard/role-provider";
 import { Plus } from "lucide-react";
 
 export function LeadsHeader() {
+  const { canEdit } = useRole();
   const [open, setOpen] = useState(false);
 
   async function handleCreate(data: Parameters<Parameters<typeof LeadForm>[0]["onSubmit"]>[0]) {
@@ -29,6 +31,7 @@ export function LeadsHeader() {
         <h1 className="text-2xl font-bold tracking-tight">Leads</h1>
         <p className="text-muted-foreground">Gestiona tus prospectos y contactos</p>
       </div>
+      {canEdit && (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button>
@@ -47,6 +50,7 @@ export function LeadsHeader() {
           />
         </DialogContent>
       </Dialog>
+      )}
     </div>
   );
 }

@@ -15,7 +15,7 @@ export async function ReferenciasTable() {
   let data: Awaited<ReturnType<typeof getReferencias>> = [];
   try {
     data = await getReferencias();
-  } catch (e) {
+  } catch {
     return (
       <p className="text-sm text-destructive py-4">
         Error al cargar. Verifica la migración 005.

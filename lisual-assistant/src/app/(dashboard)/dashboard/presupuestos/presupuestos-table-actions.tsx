@@ -23,14 +23,18 @@ import {
   type getPresupuestos,
 } from "@/lib/actions/presupuestos";
 import { useLeads } from "@/lib/hooks/use-leads";
+import { useRole } from "@/components/dashboard/role-provider";
 import type { PresupuestoFormData } from "@/lib/validations/presupuesto";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 type Presupuesto = Awaited<ReturnType<typeof getPresupuestos>>[number];
 
 export function PresupuestosTableActions({ presupuesto }: { presupuesto: Presupuesto }) {
+  const { canEdit } = useRole();
   const [editOpen, setEditOpen] = useState(false);
   const leads = useLeads();
+
+  if (!canEdit) return <span className="text-muted-foreground">—</span>;
   const leadOptions = leads.map((l) => ({ id: l.id, nombre: l.nombre, empresa: l.empresa }));
 
   const items = (presupuesto.items as { descripcion: string; cantidad: number; precio_unitario: number }[]) ?? [];

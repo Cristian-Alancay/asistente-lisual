@@ -149,7 +149,7 @@ function LoginForm() {
               supabase.auth.signInWithOAuth({
                 provider: "google",
                 options: {
-                  redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`,
+                  redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=/dashboard`,
                 },
               });
             }}
@@ -184,7 +184,7 @@ function LoginForm() {
               supabase.auth.signInWithOAuth({
                 provider: "azure",
                 options: {
-                  redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`,
+                  redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=/dashboard`,
                 },
               });
             }}
@@ -207,7 +207,7 @@ function LoginForm() {
               supabase.auth.signInWithOAuth({
                 provider: "apple",
                 options: {
-                  redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`,
+                  redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=/dashboard`,
                 },
               });
             }}

@@ -18,6 +18,7 @@ import {
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { LeadForm } from "@/components/forms/lead-form";
 import { updateLead, deleteLead } from "@/lib/actions/leads";
+import { useRole } from "@/components/dashboard/role-provider";
 import type { LeadFormData } from "@/lib/validations/lead";
 
 type Lead = {
@@ -35,7 +36,10 @@ type Lead = {
 };
 
 export function LeadsTableActions({ lead }: { lead: Lead }) {
+  const { canEdit } = useRole();
   const [editOpen, setEditOpen] = useState(false);
+
+  if (!canEdit) return <span className="text-muted-foreground">—</span>;
 
   const defaultValues: LeadFormData = {
     nombre: lead.nombre,

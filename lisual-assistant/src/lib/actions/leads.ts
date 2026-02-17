@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireCanEdit } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import type { LeadFormData } from "@/lib/validations/lead";
 
@@ -22,6 +23,8 @@ export async function getLead(id: string) {
 }
 
 export async function createLead(form: LeadFormData) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const { error } = await supabase.from("leads").insert({
     nombre: form.nombre,
@@ -41,6 +44,8 @@ export async function createLead(form: LeadFormData) {
 }
 
 export async function updateLead(id: string, form: LeadFormData) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const { error } = await supabase
     .from("leads")
@@ -64,6 +69,8 @@ export async function updateLead(id: string, form: LeadFormData) {
 }
 
 export async function deleteLead(id: string) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const { error } = await supabase.from("leads").delete().eq("id", id);
   if (error) throw error;

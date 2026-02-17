@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireCanEdit } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 const paths = ["/dashboard", "/dashboard/operaciones", "/dashboard/instalaciones"];
@@ -60,6 +61,8 @@ export async function createProyecto(form: {
   telefono_sitio?: string;
   fecha_instalacion_programada?: string;
 }) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const { error } = await supabase.from("proyectos").insert({
     cliente_id: form.cliente_id,
@@ -85,6 +88,8 @@ export async function updateProyecto(
     estado: string;
   }>
 ) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const { error } = await supabase
     .from("proyectos")
@@ -115,6 +120,8 @@ export async function createActivo(form: {
   numero_telefono?: string;
   estado?: string;
 }) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const { error } = await supabase.from("activos").insert({
     proyecto_id: form.proyecto_id || null,
@@ -130,6 +137,8 @@ export async function createActivo(form: {
 }
 
 export async function asignarActivoAProyecto(activoId: string, proyectoId: string) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const { error } = await supabase
     .from("activos")
@@ -190,6 +199,8 @@ export async function createInstalacion(form: {
   tecnico_asignado?: string;
   notas?: string;
 }) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const { error } = await supabase.from("instalaciones").insert({
     proyecto_id: form.proyecto_id,

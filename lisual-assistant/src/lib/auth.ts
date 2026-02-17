@@ -43,3 +43,11 @@ export async function isAdmin(): Promise<boolean> {
   const profile = await getProfile();
   return profile?.role === "admin";
 }
+
+/** Para Server Actions: devuelve error si el usuario es viewer (solo lectura). */
+export async function requireCanEdit(): Promise<{ error?: string }> {
+  const profile = await getProfile();
+  if (!profile) return { error: "No hay sesión" };
+  if (profile.role === "viewer") return { error: "Sin permiso. Solo lectura." };
+  return {};
+}

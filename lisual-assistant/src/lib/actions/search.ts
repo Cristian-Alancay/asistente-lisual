@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export type SearchResult = {
   id: string;
-  type: "lead" | "cliente";
+  type: "lead" | "cliente" | "presupuesto" | "proyecto";
   nombre: string;
   empresa?: string | null;
   email?: string | null;
@@ -17,12 +17,15 @@ export async function searchGlobal(q: string): Promise<SearchResult[]> {
   const term = `%${q.trim()}%`;
   const supabase = await createClient();
 
-  const [leadsNombre, leadsEmpresa, leadsEmail, clientesRes] = await Promise.all([
-    supabase.from("leads").select("id, nombre, empresa, email").ilike("nombre", term).limit(5),
-    supabase.from("leads").select("id, nombre, empresa, email").ilike("empresa", term).limit(5),
-    supabase.from("leads").select("id, nombre, empresa, email").ilike("email", term).limit(5),
-    supabase.from("clientes").select("id, leads(nombre, empresa, email)").limit(50),
-  ]);
+  const [leadsNombre, leadsEmpresa, leadsEmail, clientesRes, presupuestosRes, proyectosRes] =
+    await Promise.all([
+      supabase.from("leads").select("id, nombre, empresa, email").ilike("nombre", term).limit(5),
+      supabase.from("leads").select("id, nombre, empresa, email").ilike("empresa", term).limit(5),
+      supabase.from("leads").select("id, nombre, empresa, email").ilike("email", term).limit(5),
+      supabase.from("clientes").select("id, leads(nombre, empresa, email)").limit(50),
+      supabase.from("presupuestos").select("id, numero, leads(nombre)").ilike("numero", term).limit(5),
+      supabase.from("proyectos").select("id, nombre").ilike("nombre", term).limit(5),
+    ]);
 
   const leadIds = new Set<string>();
   const results: SearchResult[] = [];
@@ -42,6 +45,33 @@ export async function searchGlobal(q: string): Promise<SearchResult[]> {
           });
         }
       }
+    }
+  }
+
+  if (presupuestosRes.data) {
+    for (const p of presupuestosRes.data) {
+      const lead = p.leads as { nombre?: string } | null;
+      results.push({
+        id: p.id,
+        type: "presupuesto",
+        nombre: `Presupuesto ${p.numero}`,
+        empresa: lead?.nombre ?? undefined,
+        email: null,
+        href: "/dashboard/presupuestos",
+      });
+    }
+  }
+
+  if (proyectosRes.data) {
+    for (const p of proyectosRes.data) {
+      results.push({
+        id: p.id,
+        type: "proyecto",
+        nombre: p.nombre ?? "Proyecto",
+        empresa: null,
+        email: null,
+        href: "/dashboard/operaciones",
+      });
     }
   }
 

@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bot, Loader2, Send, User } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Bot, AlertCircle, Loader2, MessageSquarePlus, Send, User } from "lucide-react";
 
 type HistoryMsg = { id: string; role: string; content: string; created_at: string };
 
@@ -20,7 +21,12 @@ function toUIMessage(m: HistoryMsg) {
 export default function ChatPage() {
   const [input, setInput] = useState("");
   const [historyLoaded, setHistoryLoaded] = useState(false);
-  const { messages, sendMessage, status, setMessages } = useChat();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { messages, sendMessage, status, setMessages, error } = useChat();
+
+  function handleNuevaConversacion() {
+    setMessages([]);
+  }
 
   useEffect(() => {
     fetch("/api/chat/history?limit=50")
@@ -33,6 +39,10 @@ export default function ChatPage() {
       })
       .catch(() => setHistoryLoaded(true));
   }, [setMessages]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages]);
 
   const isLoading = status === "streaming" || status === "submitted";
 
@@ -54,14 +64,26 @@ export default function ChatPage() {
       </div>
 
       <Card className="flex flex-1 flex-col overflow-hidden">
-        <CardHeader className="border-b py-4">
-          <CardTitle className="text-lg">Conversación</CardTitle>
-          <CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between border-b py-4">
+          <div>
+            <CardTitle className="text-lg">Conversación</CardTitle>
+            <CardDescription>
             Escribe para interactuar. El asistente puede crear leads, consultar presupuestos y más.
-          </CardDescription>
+            </CardDescription>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleNuevaConversacion} disabled={isLoading}>
+            <MessageSquarePlus className="mr-2 h-4 w-4" />
+            Nueva conversación
+          </Button>
         </CardHeader>
         <CardContent className="flex flex-1 flex-col gap-4 p-0">
-          <div className="flex-1 overflow-y-auto px-4 py-4">
+          {error && (
+            <Alert variant="destructive" className="mx-4 mt-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error.message}</AlertDescription>
+            </Alert>
+          )}
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4">
             <div className="space-y-4">
               {!historyLoaded ? (
                 <div className="flex flex-col items-center justify-center gap-2 py-12 text-center text-muted-foreground">

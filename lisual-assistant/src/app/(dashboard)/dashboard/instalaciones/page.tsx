@@ -1,8 +1,6 @@
 import { Suspense } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getInstalacionesPendientes, getActivos } from "@/lib/actions/operaciones";
 import { InstalacionesPendientesTable } from "./instalaciones-pendientes-table";
 import { ActivosTable } from "./activos-table";
 import { ActivoCreateDialog } from "./activo-create-dialog";

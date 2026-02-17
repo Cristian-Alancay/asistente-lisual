@@ -90,5 +90,5 @@ Evaluación del uso de LangChain en el sistema según funcionalidades actuales y
 1. ~~Aplicar **límites** (recursionLimit, maxTokens, maxDuration)~~ **Hecho:** config con maxTokens, API con recursionLimit 20 y maxDuration 60.
 2. ~~Añadir **search_leads** y ajustar **get_lead**~~ **Hecho:** tool search_leads por nombre/empresa/email; get_lead con descripción clara.
 3. ~~Proteger **POST /api/agent** con auth o API key~~ **Hecho:** requiere sesión Supabase (401 si no hay usuario).
-4. (Opcional) Probar en WhatsApp el flujo con **lisualAgent** y comparar con detectIntent + chat().
+4. ~~(Opcional) Probar en WhatsApp el flujo con **lisualAgent**~~ **Hecho:** el webhook usa primero el agente; si falla, fallback a detectIntent + chat().
 5. ~~Documentar en el repo cuándo usar `/api/chat` (Vercel AI) vs `/api/agent` (LangChain)~~ **Hecho:** ver `docs/CHAT-Y-AGENTE-API.md`.

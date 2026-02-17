@@ -21,9 +21,11 @@ import {
 } from "@/components/ui/select";
 import { createActivo } from "@/lib/actions/operaciones";
 import { useProyectos } from "@/lib/hooks/use-proyectos";
+import { useRole } from "@/components/dashboard/role-provider";
 import { Plus } from "lucide-react";
 
 export function ActivoCreateDialog() {
+  const { canEdit } = useRole();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,6 +71,8 @@ export function ActivoCreateDialog() {
       setLoading(false);
     }
   }
+
+  if (!canEdit) return null;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

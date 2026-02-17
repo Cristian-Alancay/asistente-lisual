@@ -31,7 +31,7 @@ export async function LeadsTable() {
   let leads: Awaited<ReturnType<typeof getLeads>> = [];
   try {
     leads = await getLeads();
-  } catch (e) {
+  } catch {
     return (
       <p className="text-sm text-destructive">
         Error al cargar leads. Verifica que las tablas existan en Supabase y que RLS permita el acceso.

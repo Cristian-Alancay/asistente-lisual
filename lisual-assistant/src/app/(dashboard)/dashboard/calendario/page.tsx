@@ -1,4 +1,3 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarioView } from "./calendario-view";
 
 export default function CalendarioPage() {

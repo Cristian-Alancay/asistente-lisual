@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ClientesTable } from "./clientes-table";
 
 export default function ClientesPage() {
   return (
@@ -9,11 +10,11 @@ export default function ClientesPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Clientes</CardTitle>
-          <CardDescription>Fase 1 - Listado y detalle de clientes</CardDescription>
+          <CardTitle>Listado de clientes</CardTitle>
+          <CardDescription>Clientes con servicio activo. Desde acá podés ir a proyectos e instalaciones.</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Próximamente</p>
+          <ClientesTable />
         </CardContent>
       </Card>
     </div>

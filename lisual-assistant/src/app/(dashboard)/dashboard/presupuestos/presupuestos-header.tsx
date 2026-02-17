@@ -7,9 +7,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { PresupuestoForm } from "@/components/forms/presupuesto-form";
 import { createPresupuesto, getProximoNumero } from "@/lib/actions/presupuestos";
 import { useLeads } from "@/lib/hooks/use-leads";
+import { useRole } from "@/components/dashboard/role-provider";
 import { Plus } from "lucide-react";
 
 export function PresupuestosHeader() {
+  const { canEdit } = useRole();
   const [open, setOpen] = useState(false);
   const [proximoNumero, setProximoNumero] = useState("");
   const leads = useLeads();
@@ -35,6 +37,7 @@ export function PresupuestosHeader() {
         <h1 className="text-2xl font-bold tracking-tight">Presupuestos</h1>
         <p className="text-muted-foreground">Crea y gestiona presupuestos para leads</p>
       </div>
+      {canEdit && (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button>
@@ -55,6 +58,7 @@ export function PresupuestosHeader() {
           />
         </DialogContent>
       </Dialog>
+      )}
     </div>
   );
 }

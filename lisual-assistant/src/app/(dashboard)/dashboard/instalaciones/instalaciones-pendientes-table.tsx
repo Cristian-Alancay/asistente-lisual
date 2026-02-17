@@ -16,7 +16,7 @@ export async function InstalacionesPendientesTable() {
   let pendientes: Awaited<ReturnType<typeof getInstalacionesPendientes>> = [];
   try {
     pendientes = await getInstalacionesPendientes();
-  } catch (e) {
+  } catch {
     return (
       <p className="text-sm text-destructive py-4">
         Error al cargar. La vista v_instalaciones_pendientes requiere la migración 004.

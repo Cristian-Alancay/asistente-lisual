@@ -17,6 +17,14 @@ Cada uno puede tener **uno o más correos** y **uno o dos números de teléfono*
 - La ruta `/register` redirige siempre a `/login`.
 - Los únicos usuarios que pueden existir son los creados manualmente en Supabase (o por un admin en el futuro) y deben estar en la allowlist.
 
+### Deshabilitar registro en Supabase (recomendado)
+
+Para que nadie pueda darse de alta ni siquiera por API:
+
+1. Entrá al **Dashboard de Supabase** → **Authentication** → **Providers** → **Email**.
+2. Desactivá **“Enable Sign Up”** (o equivalente según la versión).
+3. Guardá los cambios. A partir de ahí solo se pueden crear usuarios desde el panel (Add user) o por invitación si lo tenés configurado.
+
 ## Allowlist por correo
 
 Para que solo los dos usuarios autorizados puedan entrar, se usa una **lista de correos permitidos** en entorno:
@@ -47,11 +55,19 @@ En la tabla `profiles` de Supabase cada usuario tiene:
 2. **Con SQL (datos iniciales)**  
    Ejecutá el script `supabase/scripts/seed-perfiles-usuarios.sql` en el **SQL Editor** de Supabase. Reemplazá los placeholders por los correos y teléfonos reales de Cristian y Eliana; el script hace `UPDATE profiles` para cada usuario.
 
+## Rol viewer (solo lectura)
+
+Los usuarios con rol **viewer** pueden ver el dashboard pero no crear, editar ni eliminar datos:
+
+- En la UI no se muestran botones "Nuevo Lead", "Nuevo presupuesto", "Nuevo Proyecto", "Nuevo equipo", ni los menús Editar/Eliminar en tablas.
+- Las Server Actions de escritura (createLead, updateLead, deleteLead, createPresupuesto, etc.) comprueban el rol y devuelven error "Sin permiso. Solo lectura." si el usuario es viewer.
+
 ## Rutas protegidas
 
 - **Login obligatorio**: `/dashboard/*` y `/` requieren sesión; si no hay usuario → redirección a `/login`.
 - **Solo admin**: `/dashboard/configuracion` solo es accesible si `profiles.role = 'admin'`.
 - **Auth**: Si ya hay sesión, `/login` y `/register` redirigen a `/dashboard`.
+- **OAuth**: Tras login con Google (u otro provider), Supabase redirige a `/auth/callback`; ahí se intercambia el code por sesión y se redirige a `/dashboard`.
 
 ## Autenticación (canales)
 
@@ -90,3 +106,11 @@ La allowlist y el “solo 2 usuarios” se aplican al **acceso al sistema** (qui
 - **Server**: `requireAuth()`, `requireRole('admin')`, `getProfile()` (incluye `role`, `additional_emails`, `phone_1`, `phone_2`).
 - **Middleware**: allowlist, redirección de `/register` y rutas solo admin en `src/lib/supabase/middleware.ts`.
 - **Cerrar sesión si no autorizado**: ruta `GET /api/auth/deny` cierra sesión y redirige a `/login?error=denied`.
+
+## Próximos pasos (continuar)
+
+- [ ] Deshabilitar **Enable Sign Up** en Supabase (Authentication → Providers → Email).
+- [ ] Definir **ALLOWED_USER_EMAILS** en `.env.local` con los correos reales de Cristian y Eliana.
+- [ ] Ejecutar **migración 008** (`npx supabase db push`) si aún no está aplicada.
+- [ ] Cargar datos de perfil: desde **Configuración** en la app o con `supabase/scripts/seed-perfiles-usuarios.sql`.
+- [ ] Opcional: integraciones en Configuración (Google, WhatsApp, Email) cuando se implementen.

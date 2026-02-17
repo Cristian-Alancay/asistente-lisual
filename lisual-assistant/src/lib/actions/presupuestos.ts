@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireCanEdit } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import type { PresupuestoFormData, PresupuestoItem } from "@/lib/validations/presupuesto";
 import { crearSeguimientosParaPresupuesto } from "./seguimientos";
@@ -39,6 +40,8 @@ export async function getPresupuesto(id: string) {
 }
 
 export async function createPresupuesto(form: PresupuestoFormData) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const { subtotal, impuestos, total } = calcTotals(form.items);
   const itemsDb = form.items.map((i) => ({
@@ -83,6 +86,8 @@ export async function createPresupuesto(form: PresupuestoFormData) {
 }
 
 export async function updatePresupuesto(id: string, form: PresupuestoFormData) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const { subtotal, impuestos, total } = calcTotals(form.items);
   const itemsDb = form.items.map((i) => ({
@@ -112,6 +117,8 @@ export async function updatePresupuesto(id: string, form: PresupuestoFormData) {
 }
 
 export async function updatePresupuestoEstado(id: string, estado: PresupuestoFormData["estado"]) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const pres = await getPresupuesto(id);
   const { error } = await supabase
@@ -141,6 +148,8 @@ export async function updatePresupuestoEstado(id: string, estado: PresupuestoFor
 }
 
 export async function deletePresupuesto(id: string) {
+  const check = await requireCanEdit();
+  if (check.error) throw new Error(check.error);
   const supabase = await createClient();
   const { error } = await supabase.from("presupuestos").delete().eq("id", id);
   if (error) throw error;

@@ -24,7 +24,7 @@ export async function ProyectosTable() {
   let proyectos: Awaited<ReturnType<typeof getProyectos>> = [];
   try {
     proyectos = await getProyectos();
-  } catch (e) {
+  } catch {
     return (
       <p className="text-sm text-destructive py-4">
         Error al cargar proyectos. Verifica que la migración 004 esté aplicada en Supabase.

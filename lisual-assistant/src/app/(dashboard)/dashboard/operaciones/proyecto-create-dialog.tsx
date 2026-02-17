@@ -21,9 +21,11 @@ import {
 } from "@/components/ui/select";
 import { createProyecto } from "@/lib/actions/operaciones";
 import { useClientes } from "@/lib/hooks/use-clientes";
+import { useRole } from "@/components/dashboard/role-provider";
 import { Plus } from "lucide-react";
 
 export function ProyectoCreateDialog() {
+  const { canEdit } = useRole();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +69,8 @@ export function ProyectoCreateDialog() {
       setLoading(false);
     }
   }
+
+  if (!canEdit) return null;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

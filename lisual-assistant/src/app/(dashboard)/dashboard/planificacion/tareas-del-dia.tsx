@@ -44,7 +44,7 @@ export function TareasDelDia() {
       setNueva("");
       toast.success("Tarea agregada");
       await load();
-    } catch (e) {
+    } catch {
       toast.error("Error al agregar");
     } finally {
       setAdding(false);

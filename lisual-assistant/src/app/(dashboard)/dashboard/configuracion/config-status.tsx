@@ -5,10 +5,12 @@ import { CheckCircle2, XCircle } from "lucide-react";
 const vars = [
   { key: "NEXT_PUBLIC_SUPABASE_URL", label: "Supabase URL" },
   { key: "NEXT_PUBLIC_SUPABASE_ANON_KEY", label: "Supabase Anon Key" },
-  { key: "OPENAI_API_KEY", label: "OpenAI API Key" },
   { key: "SUPABASE_SERVICE_ROLE_KEY", label: "Supabase Service Role" },
+  { key: "ALLOWED_USER_EMAILS", label: "Allowlist correos (solo 2 usuarios)" },
+  { key: "OPENAI_API_KEY", label: "OpenAI API Key" },
   { key: "EVOLUTION_API_URL", label: "Evolution API URL" },
   { key: "EVOLUTION_API_KEY", label: "Evolution API Key" },
+  { key: "EVOLUTION_INSTANCE", label: "Evolution Instance" },
   { key: "CRON_SECRET", label: "Cron Secret" },
 ];
 

@@ -31,15 +31,28 @@ export function CalendarioView() {
   const ano = date ? date.getFullYear() : new Date().getFullYear();
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
+    void Promise.resolve().then(() => {
+      if (!cancelled) setLoading(true);
+    });
     getEventosMes(ano, mes)
-      .then(setEventos)
-      .catch(() => setEventos([]))
-      .finally(() => setLoading(false));
+      .then((data) => { if (!cancelled) setEventos(data); })
+      .catch(() => { if (!cancelled) setEventos([]); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [ano, mes]);
 
   const fechaSel = date?.toISOString().split("T")[0];
   const eventosDelDia = eventos.filter((e) => e.fecha === fechaSel);
+
+  const hoy = new Date();
+  const inicioSemana = new Date(hoy);
+  inicioSemana.setDate(hoy.getDate() - hoy.getDay() + (hoy.getDay() === 0 ? -6 : 1));
+  const diasSemana = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(inicioSemana);
+    d.setDate(inicioSemana.getDate() + i);
+    return d;
+  });
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
@@ -48,7 +61,38 @@ export function CalendarioView() {
           <CardTitle>Calendario</CardTitle>
           <CardDescription>Selecciona un día para ver los eventos</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="rounded-lg border p-2">
+            <p className="mb-2 text-xs font-medium text-muted-foreground">Semana actual</p>
+            <div className="flex gap-1 overflow-x-auto">
+              {diasSemana.map((d) => {
+                const df = d.toISOString().split("T")[0];
+                const count = eventos.filter((e) => e.fecha === df).length;
+                const isSelected = df === fechaSel;
+                const isToday = df === hoy.toISOString().split("T")[0];
+                return (
+                  <button
+                    key={df}
+                    type="button"
+                    onClick={() => setDate(d)}
+                    className={`flex min-w-[44px] flex-col items-center rounded-md px-2 py-1.5 text-xs transition-colors hover:bg-accent ${
+                      isSelected ? "bg-primary text-primary-foreground" : ""
+                    } ${isToday && !isSelected ? "ring-1 ring-primary" : ""}`}
+                  >
+                    <span className="font-medium">{d.getDate()}</span>
+                    <span className="text-[10px] opacity-80">
+                      {d.toLocaleDateString("es-AR", { weekday: "short" }).slice(0, 2)}
+                    </span>
+                    {count > 0 && (
+                      <span className="mt-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-muted text-[10px]">
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <Calendar
             mode="single"
             selected={date}

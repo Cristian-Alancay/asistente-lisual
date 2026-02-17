@@ -33,16 +33,6 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/leads", label: "Leads", icon: Users },
-  { href: "/dashboard/presupuestos", label: "Presupuestos", icon: FileText },
-  { href: "/dashboard/clientes", label: "Clientes", icon: Briefcase },
-  { href: "/dashboard/operaciones", label: "Operaciones", icon: Wrench },
-  { href: "/dashboard/instalaciones", label: "Instalaciones", icon: Video },
-  { href: "/dashboard/calendario", label: "Calendario", icon: Calendar },
-];
-
 type AppSidebarProps = {
   userRole?: Role;
 };

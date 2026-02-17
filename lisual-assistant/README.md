@@ -58,6 +58,14 @@ npx supabase db push
 
 O aplicar manualmente los archivos en `supabase/migrations/`.
 
+## Seguridad y permisos
+
+Solo 2 usuarios tienen acceso (Cristian Alancay, Eliana Corraro). Sin registro público.
+
+- **Allowlist**: en `.env.local` definí `ALLOWED_USER_EMAILS=correo1@...,correo2@...`
+- **Deshabilitar registro en Supabase**: Dashboard → Authentication → Providers → Email → desactivar "Enable Sign Up" para que nadie pueda darse de alta ni por API
+- Detalle: [docs/PERMISOS.md](docs/PERMISOS.md)
+
 ## Fases
 
 1. **Fase 0** ✓ Setup, estructura, Supabase client
@@ -66,3 +74,23 @@ O aplicar manualmente los archivos en `supabase/migrations/`.
 4. **Fase 3** ✓ Experiencia al cliente
 5. **Fase 4** ✓ IA, WhatsApp, Cron seguimientos
 6. **Fase 5** ✓ Reportes y métricas
+7. **Fase 6** ✓ Permisos, roles, allowlist, perfiles (correos/teléfonos), MCP
+8. **Fase 7** ✓ Mejoras M2–M5 + Fase 6 funcional
+   - CRUD presupuestos, calendario, configuración
+   - Dashboard leads negociación, seguimientos día
+   - Reportes con gráficos Recharts, filtros por período, exportar CSV
+   - Chat con historial persistente, nueva conversación
+   - Notificaciones (seguimientos, vencimientos, instalaciones, revisiones)
+   - Búsqueda global (leads, clientes, presupuestos, proyectos)
+   - Calendario con vista semana actual
+   - Sesiones de chat (tabla `chat_sessions`)
+
+## API principales
+
+| Ruta | Descripción |
+|------|-------------|
+| `/api/chat` | Chat con IA (streaming) |
+| `/api/chat/history` | Historial de mensajes |
+| `/api/agent` | Agente con herramientas |
+| `/api/webhook/whatsapp` | Webhook Evolution API |
+| `/api/cron/seguimientos` | Cron seguimientos D3/D7 |

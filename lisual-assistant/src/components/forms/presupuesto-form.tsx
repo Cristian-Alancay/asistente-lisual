@@ -33,6 +33,7 @@ export function PresupuestoForm({ defaultValues, onSubmit, onCancel, submitLabel
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- form.watch() from react-hook-form is the standard pattern for derived form state
   const items = form.watch("items");
 
   function addItem() {

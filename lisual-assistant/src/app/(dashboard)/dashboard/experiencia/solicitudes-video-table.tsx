@@ -21,7 +21,7 @@ export async function SolicitudesVideoTable() {
   let data: Awaited<ReturnType<typeof getSolicitudesVideo>> = [];
   try {
     data = await getSolicitudesVideo();
-  } catch (e) {
+  } catch {
     return (
       <p className="text-sm text-destructive py-4">
         Error al cargar. Verifica la migración 005.

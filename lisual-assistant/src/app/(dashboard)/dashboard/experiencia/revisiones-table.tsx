@@ -22,7 +22,7 @@ export async function RevisionesTable() {
   let data: Awaited<ReturnType<typeof getRevisiones>> = [];
   try {
     data = await getRevisiones();
-  } catch (e) {
+  } catch {
     return (
       <p className="text-sm text-destructive py-4">
         Error al cargar. Verifica la migración 005.

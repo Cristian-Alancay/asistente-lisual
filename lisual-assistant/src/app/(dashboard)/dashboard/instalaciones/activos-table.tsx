@@ -28,7 +28,7 @@ export async function ActivosTable() {
   let activos: Awaited<ReturnType<typeof getActivos>> = [];
   try {
     activos = await getActivos();
-  } catch (e) {
+  } catch {
     return (
       <p className="text-sm text-destructive py-4">
         Error al cargar activos. Verifica la migración 004.

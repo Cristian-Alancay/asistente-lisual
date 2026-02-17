@@ -11,7 +11,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { searchGlobal, type SearchResult } from "@/lib/actions/search";
-import { User, Building2 } from "lucide-react";
+import { User, Building2, FileText, FolderKanban } from "lucide-react";
 
 export function GlobalSearch() {
   const [open, setOpen] = useState(false);
@@ -95,11 +95,10 @@ export function GlobalSearch() {
             <CommandGroup heading="Resultados">
               {results.map((r) => (
                 <CommandItem key={`${r.type}-${r.id}`} value={`${r.nombre} ${r.empresa ?? ""}`} onSelect={() => handleSelect(r)}>
-                  {r.type === "lead" ? (
-                    <User className="mr-2 h-4 w-4" />
-                  ) : (
-                    <Building2 className="mr-2 h-4 w-4" />
-                  )}
+                  {r.type === "lead" && <User className="mr-2 h-4 w-4" />}
+                  {r.type === "cliente" && <Building2 className="mr-2 h-4 w-4" />}
+                  {r.type === "presupuesto" && <FileText className="mr-2 h-4 w-4" />}
+                  {r.type === "proyecto" && <FolderKanban className="mr-2 h-4 w-4" />}
                   <div className="flex flex-col">
                     <span>{r.nombre}</span>
                     {(r.empresa || r.email) && (

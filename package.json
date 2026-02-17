@@ -1,0 +1,15 @@
+{
+  "name": "asistente-lisual",
+  "private": true,
+  "scripts": {
+    "dev": "cd lisual-assistant && npm run dev",
+    "build": "cd lisual-assistant && npm run build",
+    "start": "cd lisual-assistant && npm run start",
+    "lint": "cd lisual-assistant && npm run lint",
+    "test": "cd lisual-assistant && npm run test",
+    "vercel:check": "node scripts/vercel-check.js",
+    "vercel:test": "npm run vercel:check && cd lisual-assistant && npm run build",
+    "test:all": "npm run vercel:check && cd lisual-assistant && npm run test && npm run build"
+  },
+  "description": "Asistente Lisual - proyecto raíz (app en lisual-assistant/)"
+}

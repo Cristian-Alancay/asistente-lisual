@@ -1,25 +1,18 @@
 # Deploy en Vercel – Asistente Lisual
 
-## Causa del 404 NOT FOUND
-
-El frontend Next.js está en la carpeta **`lisual-assistant`**, no en la raíz del repo.  
-Si Vercel construye desde la raíz del repo, no encuentra `package.json` ni la app → **404 NOT FOUND**.
+Proyecto **unificado en la raíz**: todo está en la raíz del repo, no hay subcarpeta. Vercel no requiere Root Directory.
 
 ---
 
-## Solución (obligatoria)
+## Deploy
 
-### 1. Configurar Root Directory en Vercel
+1. Conectá el repo **asistente-lisual** a Vercel (si no está conectado).
+2. Vercel detecta Next.js y usa `npm run build` en la raíz.
+3. **No configures Root Directory** (dejalo vacío o por defecto).
 
-1. Entrá a [Vercel Dashboard](https://vercel.com/dashboard) → proyecto **asistente-lisual**
-2. **Settings** → **General**
-3. En **Root Directory**:
-   - Activá **Override**
-   - Escribí: `lisual-assistant` (sin barra final)
-4. **Save**
-5. **Redeploy**: Deployments → ⋮ del último deployment → **Redeploy**
+---
 
-### 2. Variables de entorno
+## Variables de entorno
 
 En **Settings → Environment Variables** agregá:
 
@@ -35,54 +28,32 @@ En **Settings → Environment Variables** agregá:
 | `EVOLUTION_INSTANCE` | Opcional | Para WhatsApp |
 | `CRON_SECRET` | Opcional | Proteger `/api/cron/seguimientos` |
 
-Referencia: `lisual-assistant/.env.example`
+Referencia: `.env.example`
 
 ---
 
-## Verificación local antes de deploy
+## Verificación local
 
 ```bash
-# Verificar estructura y requisitos
-npm run vercel:check
-
-# Build completo (simula Vercel)
-npm run vercel:test
+npm run vercel:check   # Estructura
+npm run vercel:test    # Check + build
+npm run test:all       # Check + tests + build
 ```
 
 ---
 
-## Troubleshooting
-
-### Sigue apareciendo 404
-
-- Confirmá que **Root Directory** = `lisual-assistant` (sin `/` final)
-- Hacé un **Redeploy** después de cambiar la configuración
-- Revisá los **Build Logs** en Vercel: si el build falla, el deploy puede quedar roto
-
-### Build falla en Vercel
-
-- Revisá que todas las variables de entorno obligatorias estén configuradas
-- Probá el build local: `cd lisual-assistant && npm run build`
-- Revisá errores de TypeScript o dependencias en los logs
-
-### Cache 404
-
-- En Vercel: **Deployments** → **Redeploy** con **Clear Cache**
-
----
-
-## Estructura del proyecto
+## Estructura (raíz única)
 
 ```
 asistente-lisual/
-├── lisual-assistant/       ← Root Directory en Vercel
-│   ├── package.json
-│   ├── next.config.ts
-│   ├── vercel.json
-│   └── src/
-│       └── app/
+├── src/
+│   └── app/
+├── public/
+├── package.json
+├── next.config.ts
+├── vercel.json
+├── .env.example
 ├── scripts/
 │   └── vercel-check.js
-├── package.json            ← Scripts raíz (dev, build, vercel:check)
 └── VERCEL.md
 ```

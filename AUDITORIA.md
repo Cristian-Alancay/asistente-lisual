@@ -11,19 +11,15 @@
 |------|--------|------------------|
 | Build Next.js local | ✓ OK | Ninguna |
 | Supabase (MCP) | ✓ OK | Ninguna |
-| Deploy Vercel | ✗ 404 | Root Directory = `lisual-assistant` |
+| Deploy Vercel | ✓ OK | Proyecto unificado en raíz |
 | Tests | Parcial | Scripts añadidos |
 | Código | ✓ OK | Advertencias menores |
 
 ---
 
-## 2. Vercel – Causa del 404
+## 2. Vercel
 
-**Problema:** Vercel construye desde la raíz del repo. En la raíz no hay `package.json` ni app Next.js; todo está en `lisual-assistant/`. Vercel no encuentra la app → sirve `/404.html`.
-
-**Solución:** En Vercel Dashboard → Settings → General → Root Directory: **`lisual-assistant`**.
-
-**Verificación:** Se creó `npm run vercel:check` y `npm run vercel:test` para validar la estructura y el build local.
+**Proyecto unificado en la raíz:** Todo el código está en la raíz del repo (sin subcarpeta `lisual-assistant`). Vercel construye desde la raíz; no hace falta configurar Root Directory.
 
 ---
 
@@ -38,7 +34,7 @@
 
 ## 4. Build local
 
-- **Comando:** `cd lisual-assistant && npm run build`
+- **Comando:** `npm run build` (desde la raíz)
 - **Resultado:** ✓ Compila OK, 29 rutas generadas
 - **Advertencia:** `middleware` deprecated → migrar a `proxy` (Next.js 16+)
 
@@ -84,7 +80,7 @@ Opcionales: `ALLOWED_USER_EMAILS`, Evolution API, `CRON_SECRET`.
 | vercel:check | `npm run vercel:check` | Valida estructura para Vercel |
 | vercel:test | `npm run vercel:test` | Check + build |
 | test:all | `npm run test:all` | Check + Vitest + build (pre-deploy completo) |
-| dev | `npm run dev` | Servidor local (lisual-assistant) |
+| dev | `npm run dev` | Servidor local |
 | build | `npm run build` | Build Next.js |
 
 ---
@@ -109,7 +105,7 @@ Opcionales: `ALLOWED_USER_EMAILS`, Evolution API, `CRON_SECRET`.
 
 ## 10. Recomendaciones
 
-1. **Vercel:** Configurar Root Directory = `lisual-assistant` y redeploy.
+1. **Vercel:** Proyecto unificado en raíz; no hace falta Root Directory.
 2. **Middleware:** Planear migración de `middleware` a `proxy` (Next.js 16).
 3. **Supabase:** Revisar advisors de seguridad (SECURITY DEFINER, leaked password protection).
 4. **Tests:** Expandir cobertura con Vitest en módulos críticos.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ function eventFechas(e: PersonalEvento): string[] {
 }
 
 export function PersonalCalendarioView() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const [eventos, setEventos] = useState<PersonalEvento[]>([]);
   const [loading, setLoading] = useState(true);
   const [nuevoTitulo, setNuevoTitulo] = useState("");
@@ -40,9 +40,16 @@ export function PersonalCalendarioView() {
   const [nuevaFin, setNuevaFin] = useState("");
   const [nuevaDesc, setNuevaDesc] = useState("");
   const [adding, setAdding] = useState(false);
+  const [hoy, setHoy] = useState<Date | null>(null);
 
-  const mes = date ? date.getMonth() + 1 : new Date().getMonth() + 1;
-  const ano = date ? date.getFullYear() : new Date().getFullYear();
+  useEffect(() => {
+    const now = new Date();
+    setHoy(now);
+    setDate(now);
+  }, []);
+
+  const mes = date ? date.getMonth() + 1 : 1;
+  const ano = date ? date.getFullYear() : 2026;
 
   async function load() {
     setLoading(true);
@@ -57,22 +64,25 @@ export function PersonalCalendarioView() {
   }
 
   useEffect(() => {
+    if (!date) return;
     load();
-  }, [ano, mes]);
+  }, [ano, mes, date]);
 
   const fechaSel = date?.toISOString().split("T")[0];
   const eventosDelDia = fechaSel
     ? eventos.filter((e) => eventFechas(e).includes(fechaSel))
     : [];
 
-  const hoy = new Date();
-  const inicioSemana = new Date(hoy);
-  inicioSemana.setDate(hoy.getDate() - hoy.getDay() + (hoy.getDay() === 0 ? -6 : 1));
-  const diasSemana = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(inicioSemana);
-    d.setDate(inicioSemana.getDate() + i);
-    return d;
-  });
+  const diasSemana = useMemo(() => {
+    if (!hoy) return [];
+    const inicioSemana = new Date(hoy);
+    inicioSemana.setDate(hoy.getDate() - hoy.getDay() + (hoy.getDay() === 0 ? -6 : 1));
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(inicioSemana);
+      d.setDate(inicioSemana.getDate() + i);
+      return d;
+    });
+  }, [hoy]);
 
   async function handleDelete(id: string) {
     try {
@@ -126,37 +136,39 @@ export function PersonalCalendarioView() {
           <CardDescription>Selecciona un día para ver los eventos</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-lg border p-2">
-            <p className="mb-2 text-xs font-medium text-muted-foreground">Semana actual</p>
-            <div className="flex gap-1 overflow-x-auto">
-              {diasSemana.map((d) => {
-                const df = d.toISOString().split("T")[0];
-                const count = countByDate[df] ?? 0;
-                const isSelected = df === fechaSel;
-                const isToday = df === hoy.toISOString().split("T")[0];
-                return (
-                  <button
-                    key={df}
-                    type="button"
-                    onClick={() => setDate(d)}
-                    className={`flex min-w-[44px] flex-col items-center rounded-md px-2 py-1.5 text-xs transition-colors hover:bg-accent ${
-                      isSelected ? "bg-primary text-primary-foreground" : ""
-                    } ${isToday && !isSelected ? "ring-1 ring-primary" : ""}`}
-                  >
-                    <span className="font-medium">{d.getDate()}</span>
-                    <span className="text-[10px] opacity-80">
-                      {d.toLocaleDateString("es-AR", { weekday: "short" }).slice(0, 2)}
-                    </span>
-                    {count > 0 && (
-                      <span className="mt-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-muted text-[10px]">
-                        {count}
+          {hoy && diasSemana.length > 0 && (
+            <div className="rounded-lg border p-2">
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Semana actual</p>
+              <div className="flex gap-1 overflow-x-auto">
+                {diasSemana.map((d) => {
+                  const df = d.toISOString().split("T")[0];
+                  const count = countByDate[df] ?? 0;
+                  const isSelected = df === fechaSel;
+                  const isToday = df === hoy.toISOString().split("T")[0];
+                  return (
+                    <button
+                      key={df}
+                      type="button"
+                      onClick={() => setDate(d)}
+                      className={`flex min-w-[44px] flex-col items-center rounded-md px-2 py-1.5 text-xs transition-colors hover:bg-accent ${
+                        isSelected ? "bg-primary text-primary-foreground" : ""
+                      } ${isToday && !isSelected ? "ring-1 ring-primary" : ""}`}
+                    >
+                      <span className="font-medium">{d.getDate()}</span>
+                      <span className="text-[10px] opacity-80">
+                        {d.toLocaleDateString("es-AR", { weekday: "short" }).slice(0, 2)}
                       </span>
-                    )}
-                  </button>
-                );
-              })}
+                      {count > 0 && (
+                        <span className="mt-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-muted text-[10px]">
+                          {count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
           <Calendar
             mode="single"
             selected={date}

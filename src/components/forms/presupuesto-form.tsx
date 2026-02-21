@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ export function PresupuestoForm({ defaultValues, onSubmit, onCancel, submitLabel
     defaultValues: {
       lead_id: "",
       numero: "",
-      fecha_emision: new Date().toISOString().split("T")[0],
+      fecha_emision: "",
       vigencia_hasta: "",
       items: [{ descripcion: "", cantidad: 1, precio_unitario: 0 }],
       moneda: "ARS",
@@ -32,6 +33,12 @@ export function PresupuestoForm({ defaultValues, onSubmit, onCancel, submitLabel
       ...defaultValues,
     },
   });
+
+  useEffect(() => {
+    if (!defaultValues?.fecha_emision && !form.getValues("fecha_emision")) {
+      form.setValue("fecha_emision", new Date().toISOString().split("T")[0]);
+    }
+  }, [defaultValues, form]);
 
   // eslint-disable-next-line react-hooks/incompatible-library -- form.watch() from react-hook-form is the standard pattern for derived form state
   const items = form.watch("items");

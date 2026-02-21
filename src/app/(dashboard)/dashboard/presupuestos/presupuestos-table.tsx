@@ -21,10 +21,10 @@ const estadoLabels: Record<string, string> = {
   vencido: "Vencido",
 };
 
-export async function PresupuestosTable() {
+export async function PresupuestosTable({ leadId }: { leadId?: string }) {
   let data: Awaited<ReturnType<typeof getPresupuestos>> = [];
   try {
-    data = await getPresupuestos();
+    data = await getPresupuestos(leadId);
   } catch {
     return <p className="text-sm text-destructive">Error al cargar presupuestos.</p>;
   }

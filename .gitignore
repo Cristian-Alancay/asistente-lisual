@@ -1,5 +1,6 @@
 # Cursor / IDE
 .cursor
+.vscode
 
 # dependencies
 node_modules

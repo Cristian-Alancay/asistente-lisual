@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -46,12 +47,35 @@ export function LeadForm({
       canal_origen: "manual" as const,
       estado: "prospecto" as const,
       presupuesto_estimado: undefined,
+      presupuesto_estimado_moneda: "ARS" as const,
+      link_reunion: "",
       necesidad: "",
       fecha_decision_estimada: "",
       notas: "",
       ...defaultValues,
     },
   });
+
+  const presupuesto = form.watch("presupuesto_estimado");
+  const moneda = form.watch("presupuesto_estimado_moneda");
+  const [ventaBna, setVentaBna] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch("/api/dolar-oficial");
+        if (!r.ok || cancelled) return;
+        const j = await r.json();
+        if (typeof j.venta === "number") setVentaBna(j.venta);
+      } catch {
+        if (!cancelled) setVentaBna(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function handleSubmit(data: LeadFormData) {
     await onSubmit(data);
@@ -162,22 +186,68 @@ export function LeadForm({
             )}
           />
         </div>
+        <div className="grid grid-cols-[1fr_auto] gap-2 items-end">
+          <FormField
+            control={form.control}
+            name="presupuesto_estimado"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Presupuesto estimado</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    {...field}
+                    value={field.value ?? ""}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      field.onChange(v === "" ? undefined : Number(v));
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="presupuesto_estimado_moneda"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Moneda</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value ?? "ARS"}>
+                  <FormControl>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="ARS">ARS</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        {moneda === "USD" && typeof presupuesto === "number" && presupuesto > 0 && ventaBna != null && (
+          <p className="text-sm text-muted-foreground">
+            Equivalente: <strong>{Math.round(presupuesto * ventaBna).toLocaleString("es-AR")} ARS</strong> (dólar oficial BNA venta)
+          </p>
+        )}
         <FormField
           control={form.control}
-          name="presupuesto_estimado"
+          name="link_reunion"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Presupuesto estimado</FormLabel>
+              <FormLabel>Link de reunión</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
-                  placeholder="0"
+                  type="url"
+                  placeholder="https://meet.google.com/..."
                   {...field}
                   value={field.value ?? ""}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    field.onChange(v === "" ? undefined : Number(v));
-                  }}
                 />
               </FormControl>
               <FormMessage />

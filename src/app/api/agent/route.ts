@@ -1,8 +1,9 @@
 import { AIMessage, HumanMessage } from "@langchain/core/messages";
-import { isLangChainAvailable, prepareImageForAgent } from "@/lib/langchain";
-import { lisualAgent } from "@/lib/langchain/agent";
+import { isLangChainAvailable, prepareImageForAgent, extractContent } from "@/lib/langchain";
+import { trabajoAgent } from "@/lib/langchain/agent";
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { cacheHeaders } from "@/lib/api-headers";
 
 type MessageRole = "user" | "assistant";
 
@@ -51,13 +52,16 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.json({ error: "No autenticado. Iniciá sesión para usar el agente." }, { status: 401 });
+    return NextResponse.json(
+      { error: "No autenticado. Iniciá sesión para usar el agente." },
+      { status: 401, headers: cacheHeaders.private() }
+    );
   }
 
   if (!isLangChainAvailable()) {
     return NextResponse.json(
       { error: "OPENAI_API_KEY no configurada. Añádela en .env.local." },
-      { status: 503 }
+      { status: 503, headers: cacheHeaders.private() }
     );
   }
   try {
@@ -77,7 +81,7 @@ export async function POST(request: NextRequest) {
     if (typed.length === 0 && !imageInput) {
       return NextResponse.json(
         { error: "Envía al menos un mensaje en 'messages' o una imagen en 'imageBase64'." },
-        { status: 400 }
+        { status: 400, headers: cacheHeaders.private() }
       );
     }
 
@@ -94,35 +98,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await lisualAgent.invoke(
+    const result = await trabajoAgent.invoke(
       { messages },
       { recursionLimit: AGENT_RECURSION_LIMIT }
     );
 
     const resultMessages = (result as { messages?: unknown[] }).messages ?? [];
-    const extractContent = (msg: unknown): string => {
-      if (!msg || typeof msg !== "object") return "";
-      const c = (msg as { content?: unknown }).content;
-      if (typeof c === "string") return c;
-      if (Array.isArray(c))
-        return (c as { type?: string; text?: string }[])
-          .filter((b) => b?.type === "text" && typeof b.text === "string")
-          .map((b) => (b as { text: string }).text)
-          .join("");
-      return "";
-    };
     const lastMessage = resultMessages[resultMessages.length - 1];
     const content = extractContent(lastMessage);
 
-    return NextResponse.json({
-      content: content || "(Sin respuesta de texto)",
-      messages: resultMessages,
-    });
+    return NextResponse.json(
+      {
+        content: content || "(Sin respuesta de texto)",
+        messages: resultMessages,
+      },
+      { headers: cacheHeaders.private() }
+    );
   } catch (err) {
     console.error("[api/agent]", err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Error al ejecutar el agente." },
-      { status: 500 }
+      { status: 500, headers: cacheHeaders.private() }
     );
   }
 }

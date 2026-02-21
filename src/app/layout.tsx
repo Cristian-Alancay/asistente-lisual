@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { LocaleProvider } from "@/contexts/locale-context";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -14,9 +15,31 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  minimumScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
+};
+
 export const metadata: Metadata = {
-  title: "Asistente Lisual",
+  title: "Assistant Cristian Alancay",
   description: "Asistente personal para ventas, operaciones y experiencia al cliente",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Assistant Cristian Alancay",
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+  },
 };
 
 export default function RootLayout({
@@ -35,8 +58,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster richColors position="top-right" />
+          <LocaleProvider>
+            {children}
+            <Toaster richColors position="top-right" />
+          </LocaleProvider>
         </ThemeProvider>
       </body>
     </html>

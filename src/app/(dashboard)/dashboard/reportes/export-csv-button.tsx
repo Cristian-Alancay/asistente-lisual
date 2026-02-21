@@ -23,7 +23,7 @@ export function ExportCsvButton({ desde, hasta }: Props) {
     ]);
 
     const rows: string[][] = [
-      ["Reporte Lisual", "", "", ""],
+      ["Reporte Assistant Cristian Alancay", "", "", ""],
       ["Generado", new Date().toLocaleString("es-AR"), "", ""],
       ["", "", "", ""],
       ["VENTAS", "", "", ""],
@@ -49,7 +49,7 @@ export function ExportCsvButton({ desde, hasta }: Props) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `reporte-lisual-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `reporte-trabajo-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }

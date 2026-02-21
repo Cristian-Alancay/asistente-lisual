@@ -13,11 +13,11 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-svh bg-gradient-to-b from-background to-muted/30">
-      <div className="container mx-auto px-4 py-16 md:py-24">
-        <header className="flex justify-between items-center mb-16">
-          <span className="text-xl font-bold">Lisual</span>
-          <div className="flex gap-2">
+    <div className="min-h-screen-mobile min-h-svh bg-gradient-to-b from-background to-muted/30">
+      <div className="container mx-auto px-4 py-12 safe-area-padding-x md:py-24">
+        <header className="flex justify-between items-center mb-12 md:mb-16">
+          <span className="truncate text-lg font-bold sm:text-xl">Assistant Cristian Alancay</span>
+          <div className="flex shrink-0 gap-2">
             <Button variant="ghost" asChild>
               <Link href="/login">Iniciar sesión</Link>
             </Button>

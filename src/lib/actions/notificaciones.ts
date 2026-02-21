@@ -103,3 +103,56 @@ export async function getNotificaciones(limit = 10): Promise<Notificacion[]> {
 
   return items.slice(0, limit);
 }
+
+/** Resumen para alertas proactivas: contadores por tipo y cuántos son "hoy" */
+export type ResumenAlertasProactivas = {
+  total: number;
+  seguimientos: number;
+  seguimientosHoy: number;
+  presupuestosVencen: number;
+  presupuestosVencenHoy: number;
+  instalaciones: number;
+  revisiones: number;
+};
+
+export async function getResumenAlertasProactivas(): Promise<ResumenAlertasProactivas> {
+  const items = await getNotificaciones(30);
+  const hoy = new Date().toISOString().slice(0, 10);
+
+  let seguimientos = 0;
+  let seguimientosHoy = 0;
+  let presupuestosVencen = 0;
+  let presupuestosVencenHoy = 0;
+  let instalaciones = 0;
+  let revisiones = 0;
+
+  for (const n of items) {
+    const esHoy = n.fecha?.slice(0, 10) === hoy;
+    switch (n.tipo) {
+      case "seguimiento":
+        seguimientos++;
+        if (esHoy) seguimientosHoy++;
+        break;
+      case "presupuesto_vencimiento":
+        presupuestosVencen++;
+        if (esHoy) presupuestosVencenHoy++;
+        break;
+      case "instalacion":
+        instalaciones++;
+        break;
+      case "revision":
+        revisiones++;
+        break;
+    }
+  }
+
+  return {
+    total: items.length,
+    seguimientos,
+    seguimientosHoy,
+    presupuestosVencen,
+    presupuestosVencenHoy,
+    instalaciones,
+    revisiones,
+  };
+}

@@ -22,8 +22,12 @@ const tipoIcon: Record<Notificacion["tipo"], React.ReactNode> = {
 export function NotificationsDropdown() {
   const [items, setItems] = useState<Notificacion[]>([]);
 
+  const refresh = () => getNotificaciones(10).then(setItems).catch(() => setItems([]));
+
   useEffect(() => {
-    getNotificaciones(10).then(setItems).catch(() => setItems([]));
+    refresh();
+    const interval = setInterval(refresh, 5 * 60 * 1000); // cada 5 min
+    return () => clearInterval(interval);
   }, []);
 
   return (

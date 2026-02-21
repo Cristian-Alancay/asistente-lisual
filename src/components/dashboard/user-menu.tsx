@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import Link from "next/link";
 import { LogOut, Loader2, Settings } from "lucide-react";
+import { toast } from "sonner";
 import { signOut } from "@/lib/actions/auth";
 import type { Profile } from "@/types/auth";
 import {
@@ -38,6 +39,7 @@ export function UserMenu({ profile }: UserMenuProps) {
 
   function handleSignOut(e: Event) {
     e.preventDefault();
+    toast.success("Sesión cerrada", { description: "Cerrando sesión…" });
     startTransition(() => signOut());
   }
 

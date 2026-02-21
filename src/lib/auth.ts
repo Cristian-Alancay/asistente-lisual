@@ -12,14 +12,17 @@ export async function getProfile(): Promise<Profile | null> {
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("id, email, full_name, role, additional_emails, phone_1, phone_2, created_at, updated_at")
+    .select("id, email, full_name, role, created_at, updated_at")
     .eq("id", user.id)
     .single();
 
   if (error || !profile) return null;
+  const row = profile as Record<string, unknown>;
   return {
     ...profile,
-    additional_emails: profile.additional_emails ?? [],
+    additional_emails: (row?.additional_emails as string[] | undefined) ?? [],
+    phone_1: (row?.phone_1 as string | null) ?? null,
+    phone_2: (row?.phone_2 as string | null) ?? null,
   } as Profile;
 }
 

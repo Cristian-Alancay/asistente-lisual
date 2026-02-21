@@ -1,10 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { requireCanEdit } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
+import { withEditAuth } from "./with-edit-auth";
 
-const paths = ["/dashboard", "/dashboard/operaciones", "/dashboard/instalaciones"];
+const PATHS = ["/dashboard", "/dashboard/operaciones", "/dashboard/instalaciones"];
 
 export async function getProyectos() {
   const supabase = await createClient();
@@ -61,20 +60,18 @@ export async function createProyecto(form: {
   telefono_sitio?: string;
   fecha_instalacion_programada?: string;
 }) {
-  const check = await requireCanEdit();
-  if (check.error) throw new Error(check.error);
-  const supabase = await createClient();
-  const { error } = await supabase.from("proyectos").insert({
-    cliente_id: form.cliente_id,
-    nombre: form.nombre,
-    direccion: form.direccion || null,
-    contacto_sitio: form.contacto_sitio || null,
-    telefono_sitio: form.telefono_sitio || null,
-    fecha_instalacion_programada: form.fecha_instalacion_programada || null,
-    estado: form.fecha_instalacion_programada ? "programada" : "pendiente",
+  return withEditAuth(PATHS, async ({ supabase }) => {
+    const { error } = await supabase.from("proyectos").insert({
+      cliente_id: form.cliente_id,
+      nombre: form.nombre,
+      direccion: form.direccion || null,
+      contacto_sitio: form.contacto_sitio || null,
+      telefono_sitio: form.telefono_sitio || null,
+      fecha_instalacion_programada: form.fecha_instalacion_programada || null,
+      estado: form.fecha_instalacion_programada ? "programada" : "pendiente",
+    });
+    if (error) throw error;
   });
-  if (error) throw error;
-  paths.forEach((p) => revalidatePath(p));
 }
 
 export async function updateProyecto(
@@ -88,15 +85,13 @@ export async function updateProyecto(
     estado: string;
   }>
 ) {
-  const check = await requireCanEdit();
-  if (check.error) throw new Error(check.error);
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("proyectos")
-    .update({ ...form, updated_at: new Date().toISOString() })
-    .eq("id", id);
-  if (error) throw error;
-  paths.forEach((p) => revalidatePath(p));
+  return withEditAuth(PATHS, async ({ supabase }) => {
+    const { error } = await supabase
+      .from("proyectos")
+      .update(form)
+      .eq("id", id);
+    if (error) throw error;
+  });
 }
 
 export async function getActivos(proyectoId?: string) {
@@ -120,32 +115,28 @@ export async function createActivo(form: {
   numero_telefono?: string;
   estado?: string;
 }) {
-  const check = await requireCanEdit();
-  if (check.error) throw new Error(check.error);
-  const supabase = await createClient();
-  const { error } = await supabase.from("activos").insert({
-    proyecto_id: form.proyecto_id || null,
-    tipo: form.tipo,
-    codigo: form.codigo,
-    numero_serie: form.numero_serie || null,
-    iccid: form.iccid || null,
-    numero_telefono: form.numero_telefono || null,
-    estado: form.proyecto_id ? "asignado" : form.estado || "en_stock",
+  return withEditAuth(PATHS, async ({ supabase }) => {
+    const { error } = await supabase.from("activos").insert({
+      proyecto_id: form.proyecto_id || null,
+      tipo: form.tipo,
+      codigo: form.codigo,
+      numero_serie: form.numero_serie || null,
+      iccid: form.iccid || null,
+      numero_telefono: form.numero_telefono || null,
+      estado: form.proyecto_id ? "asignado" : form.estado || "en_stock",
+    });
+    if (error) throw error;
   });
-  if (error) throw error;
-  paths.forEach((p) => revalidatePath(p));
 }
 
 export async function asignarActivoAProyecto(activoId: string, proyectoId: string) {
-  const check = await requireCanEdit();
-  if (check.error) throw new Error(check.error);
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("activos")
-    .update({ proyecto_id: proyectoId, estado: "asignado", updated_at: new Date().toISOString() })
-    .eq("id", activoId);
-  if (error) throw error;
-  paths.forEach((p) => revalidatePath(p));
+  return withEditAuth(PATHS, async ({ supabase }) => {
+    const { error } = await supabase
+      .from("activos")
+      .update({ proyecto_id: proyectoId, estado: "asignado" })
+      .eq("id", activoId);
+    if (error) throw error;
+  });
 }
 
 export async function getInstalaciones(proyectoId?: string) {
@@ -199,14 +190,12 @@ export async function createInstalacion(form: {
   tecnico_asignado?: string;
   notas?: string;
 }) {
-  const check = await requireCanEdit();
-  if (check.error) throw new Error(check.error);
-  const supabase = await createClient();
-  const { error } = await supabase.from("instalaciones").insert({
-    proyecto_id: form.proyecto_id,
-    tecnico_asignado: form.tecnico_asignado || null,
-    notas: form.notas || null,
+  return withEditAuth(PATHS, async ({ supabase }) => {
+    const { error } = await supabase.from("instalaciones").insert({
+      proyecto_id: form.proyecto_id,
+      tecnico_asignado: form.tecnico_asignado || null,
+      notas: form.notas || null,
+    });
+    if (error) throw error;
   });
-  if (error) throw error;
-  paths.forEach((p) => revalidatePath(p));
 }

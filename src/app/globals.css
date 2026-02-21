@@ -126,6 +126,57 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Safari/iOS: evitar zoom en inputs y mejorar scroll */
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* iOS: inputs con font-size >= 16px evitan zoom al enfocar */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  @media (min-width: 768px) {
+    input,
+    select,
+    textarea {
+      font-size: 14px;
+    }
+  }
+}
+
+/* ===== Responsive + ecosistema Apple (Safari, iPad, iPhone) ===== */
+/* Safe area insets para notch y home indicator */
+.safe-area-inset-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-area-inset-left {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+.safe-area-inset-right {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+.safe-area-padding-x {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+/* Altura mínima en móvil usando dvh (Safari 15.4+) */
+.min-h-screen-mobile {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+/* Touch targets mínimos 44px (Apple HIG) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+@media (pointer: fine) {
+  .touch-target {
+    min-height: unset;
+    min-width: unset;
   }
 }
 
@@ -138,4 +189,249 @@
 }
 .dark .bg-gradient-subtle {
   background: linear-gradient(180deg, oklch(0.3 0.05 260 / 0.3) 0%, transparent 100%);
+}
+
+/* ===== Auth (login/register) ===== */
+.auth-page {
+  --auth-gradient-from: oklch(0.55 0.2 270);
+  --auth-gradient-via: oklch(0.45 0.15 250);
+  --auth-gradient-to: oklch(0.35 0.12 240);
+}
+:root .auth-page {
+  --auth-gradient-from: oklch(0.7 0.15 270);
+  --auth-gradient-via: oklch(0.6 0.12 250);
+  --auth-gradient-to: oklch(0.5 0.08 240);
+}
+.dark .auth-page {
+  --auth-gradient-from: oklch(0.4 0.18 270);
+  --auth-gradient-via: oklch(0.28 0.12 250);
+  --auth-gradient-to: oklch(0.15 0.06 240);
+}
+
+.bg-auth-gradient {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, var(--auth-gradient-from) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 50%, var(--auth-gradient-via) 0%, transparent 45%),
+    radial-gradient(ellipse 50% 60% at 0% 80%, var(--auth-gradient-to) 0%, transparent 45%),
+    linear-gradient(180deg, var(--background) 0%, var(--background) 100%);
+  opacity: 0.95;
+}
+.dark .bg-auth-gradient {
+  opacity: 1;
+}
+
+.auth-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: auth-orb-float 20s ease-in-out infinite;
+  will-change: transform;
+}
+.dark .auth-orb {
+  opacity: 0.25;
+}
+.auth-orb-1 {
+  width: 400px;
+  height: 400px;
+  background: oklch(0.55 0.2 270);
+  top: -120px;
+  right: -100px;
+  animation-delay: 0s;
+}
+.auth-orb-2 {
+  width: 300px;
+  height: 300px;
+  background: oklch(0.5 0.15 220);
+  bottom: 10%;
+  left: -80px;
+  animation-delay: -7s;
+}
+.auth-orb-3 {
+  width: 250px;
+  height: 250px;
+  background: oklch(0.45 0.18 260);
+  bottom: -60px;
+  right: 20%;
+  animation-delay: -14s;
+}
+@keyframes auth-orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(15px, -20px) scale(1.05); }
+  66% { transform: translate(-10px, 15px) scale(0.98); }
+}
+
+/* Card login: borde con gradiente + transiciones */
+.auth-card {
+  position: relative;
+  border: 1px solid oklch(0.3 0.05 260 / 0.5);
+  box-shadow:
+    0 0 0 1px oklch(1 0 0 / 0.03),
+    0 25px 50px -12px oklch(0 0 0 / 0.25);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.dark .auth-card {
+  border-color: oklch(0.4 0.08 260 / 0.4);
+  box-shadow:
+    0 0 0 1px oklch(1 0 0 / 0.05),
+    0 25px 50px -12px oklch(0 0 0 / 0.5);
+}
+.auth-card:hover {
+  box-shadow:
+    0 0 0 1px oklch(var(--primary) / 0.15),
+    0 30px 60px -15px oklch(0 0 0 / 0.3);
+}
+.dark .auth-card:hover {
+  box-shadow:
+    0 0 0 1px oklch(0.6 0.2 270 / 0.2),
+    0 30px 60px -15px oklch(0 0 0 / 0.6);
+}
+
+/* Entrada suave del card */
+@keyframes auth-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-auth-card-in {
+  animation: auth-card-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Inputs con transición de focus */
+.auth-input:focus-within {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* Botón principal con gradiente y hover */
+.auth-primary-btn {
+  background: linear-gradient(135deg, oklch(0.55 0.2 270) 0%, oklch(0.48 0.18 260) 100%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+.auth-primary-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px -5px oklch(0.5 0.2 270 / 0.4);
+}
+.auth-primary-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+.dark .auth-primary-btn {
+  background: linear-gradient(135deg, oklch(0.6 0.22 270) 0%, oklch(0.52 0.2 260) 100%);
+}
+.dark .auth-primary-btn:hover:not(:disabled) {
+  box-shadow: 0 8px 25px -5px oklch(0.55 0.25 270 / 0.35);
+}
+.auth-primary-btn:focus-visible {
+  box-shadow: 0 0 0 3px oklch(0.5 0.2 270 / 0.35);
+}
+.dark .auth-primary-btn:focus-visible {
+  box-shadow: 0 0 0 3px oklch(0.6 0.25 270 / 0.4);
+}
+
+/* Shimmer sutil en el card de login */
+.auth-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, oklch(0.6 0.2 270 / 0.15) 0%, transparent 40%, transparent 60%, oklch(0.5 0.15 220 / 0.1) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: auth-card-shimmer 8s ease-in-out infinite;
+}
+@keyframes auth-card-shimmer {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Orbes: pulso muy sutil adicional (mantiene position/size del bloque anterior) */
+.auth-orb-1 { animation: auth-orb-float 20s ease-in-out infinite, auth-orb-pulse 12s ease-in-out infinite; animation-delay: 0s, 0s; }
+.auth-orb-2 { animation: auth-orb-float 20s ease-in-out infinite, auth-orb-pulse 14s ease-in-out infinite; animation-delay: -7s, 1s; }
+.auth-orb-3 { animation: auth-orb-float 20s ease-in-out infinite, auth-orb-pulse 10s ease-in-out infinite; animation-delay: -14s, 2s; }
+@keyframes auth-orb-pulse {
+  0%, 100% { opacity: 0.4; transform: translate(0, 0) scale(1); }
+  50% { opacity: 0.55; transform: translate(0, 0) scale(1.08); }
+}
+.dark .auth-orb { opacity: 0.25; }
+
+/* ===== Tema gradiente para todo el sistema (dashboard y app) ===== */
+.app-gradient-bg {
+  background:
+    radial-gradient(ellipse 70% 40% at 50% -10%, var(--gradient-start) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 30% at 100% 0%, var(--gradient-end) 0%, transparent 45%),
+    radial-gradient(ellipse 40% 50% at 0% 100%, var(--gradient-end) 0%, transparent 45%),
+    var(--background);
+}
+.dark .app-gradient-bg {
+  background:
+    radial-gradient(ellipse 70% 40% at 50% -10%, oklch(0.4 0.15 270 / 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 30% at 100% 0%, oklch(0.35 0.12 250 / 0.3) 0%, transparent 45%),
+    radial-gradient(ellipse 40% 50% at 0% 100%, oklch(0.35 0.12 240 / 0.3) 0%, transparent 45%),
+    var(--background);
+}
+
+/* Orbes suaves en dashboard (opcional, más tenues que login) */
+.app-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.2;
+  animation: app-orb-float 25s ease-in-out infinite;
+  pointer-events: none;
+}
+.dark .app-orb { opacity: 0.12; }
+.app-orb-1 { width: 320px; height: 320px; background: var(--gradient-start); top: -80px; right: -60px; animation-delay: 0s; }
+.app-orb-2 { width: 240px; height: 240px; background: var(--gradient-end); bottom: 10%; left: -60px; animation-delay: -10s; }
+@keyframes app-orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(10px, -15px) scale(1.03); }
+  66% { transform: translate(-8px, 10px) scale(0.98); }
+}
+
+/* Botones primary con gradiente en todo el sistema */
+[data-slot="button"][data-variant="default"] {
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+  color: var(--primary-foreground);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+[data-slot="button"][data-variant="default"]:hover:not(:disabled) {
+  opacity: 0.95;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px -5px oklch(0.5 0.2 270 / 0.35);
+}
+.dark [data-slot="button"][data-variant="default"]:hover:not(:disabled) {
+  box-shadow: 0 6px 20px -5px oklch(0.55 0.25 270 / 0.3);
+}
+[data-slot="button"][data-variant="default"]:active:not(:disabled) {
+  transform: translateY(0);
+}
+[data-slot="button"][data-variant="default"]:focus-visible {
+  box-shadow: 0 0 0 3px oklch(0.5 0.2 270 / 0.35);
+}
+.dark [data-slot="button"][data-variant="default"]:focus-visible {
+  box-shadow: 0 0 0 3px oklch(0.6 0.25 270 / 0.4);
+}
+
+/* Header del dashboard: borde inferior con tinte gradiente */
+.app-header-gradient {
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, oklch(0.5 0.2 270 / 0.25), oklch(0.45 0.15 250 / 0.2), oklch(0.5 0.2 270 / 0.25)) 1;
+  box-shadow: 0 1px 0 0 oklch(0.5 0.2 270 / 0.08);
+}
+.dark .app-header-gradient {
+  border-image: linear-gradient(90deg, oklch(0.6 0.2 270 / 0.2), oklch(0.5 0.15 250 / 0.15), oklch(0.6 0.2 270 / 0.2)) 1;
+  box-shadow: 0 1px 0 0 oklch(0.6 0.25 270 / 0.1);
+}
+
+/* Sidebar: sin barra lateral (línea azul removida) */
+.sidebar-gradient-accent {
+  border-left: none;
 }

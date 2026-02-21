@@ -1,15 +1,17 @@
 import {
   isLangChainAvailable,
-  lisualAgent,
+  trabajoAgent,
   detectIntent,
   chat,
   prepareImageForAgent,
+  extractContent,
 } from "@/lib/langchain";
 import { createLead } from "@/lib/actions/leads";
 import { sendWhatsAppText } from "@/lib/evolution";
 import { HumanMessage } from "@langchain/core/messages";
 import { NextRequest, NextResponse } from "next/server";
 import type { LeadFormData } from "@/lib/validations/lead";
+import { cacheHeaders } from "@/lib/api-headers";
 
 const AGENT_RECURSION_LIMIT = 15;
 
@@ -57,19 +59,11 @@ function extractImageFromPayload(body: unknown): string | null {
 function extractAgentContent(result: { messages?: unknown[] }): string {
   const messages = result.messages ?? [];
   const last = messages[messages.length - 1];
-  if (!last || typeof last !== "object") return "";
-  const c = (last as { content?: unknown }).content;
-  if (typeof c === "string") return c;
-  if (Array.isArray(c))
-    return (c as { type?: string; text?: string }[])
-      .filter((b) => b?.type === "text" && typeof b.text === "string")
-      .map((b) => (b as { text: string }).text)
-      .join("");
-  return "";
+  return extractContent(last);
 }
 
 const CHAT_SYSTEM =
-  "Eres el asistente de Lisual (soluciones de video y seguridad). Responde de forma breve y amigable en español.";
+  "Eres el Assistant Cristian Alancay (soluciones de video y seguridad). Responde de forma breve y amigable en español.";
 
 export async function POST(request: NextRequest) {
   try {
@@ -99,7 +93,7 @@ export async function POST(request: NextRequest) {
           }
           const messages = [new HumanMessage({ content })];
 
-          const result = await lisualAgent.invoke(
+          const result = await trabajoAgent.invoke(
             { messages },
             { recursionLimit: AGENT_RECURSION_LIMIT }
           );
@@ -117,7 +111,7 @@ export async function POST(request: NextRequest) {
           if (intent.intent === "crear_lead" && intent.confianza >= 0.7 && intent.datos_extraidos) {
             const d = intent.datos_extraidos;
             const nombre = d.nombre ?? d.nombre_completo ?? "Contacto WhatsApp";
-            const email = d.email ?? (senderNumber ? `whatsapp-${senderNumber}@lisual.temp` : null);
+            const email = d.email ?? (senderNumber ? `whatsapp-${senderNumber}@trabajo.temp` : null);
             const telefono = d.telefono ?? senderNumber ?? undefined;
 
             if (email) {
@@ -128,6 +122,7 @@ export async function POST(request: NextRequest) {
                 empresa: d.empresa ?? undefined,
                 canal_origen: "whatsapp",
                 estado: "prospecto",
+                presupuesto_estimado_moneda: "ARS",
                 presupuesto_estimado: undefined,
                 necesidad: intent.resumen || undefined,
                 fecha_decision_estimada: undefined,
@@ -135,7 +130,7 @@ export async function POST(request: NextRequest) {
               };
               await createLead(form);
               reply =
-                "¡Perfecto! Registré tus datos. Un asesor de Lisual te contactará pronto. ¿Necesitas algo más?";
+                "¡Perfecto! Registré tus datos. Un asesor de Assistant Cristian Alancay te contactará pronto. ¿Necesitas algo más?";
             } else {
               reply =
                 "Para registrarte necesito tu email. ¿Podés enviármelo? También tu nombre si querés.";
@@ -158,8 +153,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(response, {
+      status: 200,
+      headers: cacheHeaders.private(),
+    });
   } catch {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid payload" },
+      { status: 400, headers: cacheHeaders.private() }
+    );
   }
 }

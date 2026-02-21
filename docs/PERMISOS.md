@@ -1,4 +1,4 @@
-# Permisos y restricciones del sistema (ID Lisual)
+# Permisos y restricciones del sistema (Assistant Cristian Alancay)
 
 ## Usuarios con acceso
 

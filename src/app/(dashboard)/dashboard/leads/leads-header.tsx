@@ -20,9 +20,14 @@ export function LeadsHeader() {
   const [open, setOpen] = useState(false);
 
   async function handleCreate(data: Parameters<Parameters<typeof LeadForm>[0]["onSubmit"]>[0]) {
-    await createLead(data);
-    toast.success("Lead creado correctamente");
-    setOpen(false);
+    try {
+      await createLead(data);
+      toast.success("Lead creado correctamente");
+      setOpen(false);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Error al crear el lead";
+      toast.error(msg);
+    }
   }
 
   return (

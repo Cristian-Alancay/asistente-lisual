@@ -2,17 +2,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PresupuestosHeader } from "./presupuestos-header";
 import { PresupuestosTable } from "./presupuestos-table";
 
-export default function PresupuestosPage() {
+type Props = { searchParams?: { lead_id?: string } };
+
+export default function PresupuestosPage({ searchParams }: Props) {
+  const leadId = searchParams?.lead_id;
+
   return (
     <div className="space-y-6">
       <PresupuestosHeader />
       <Card>
         <CardHeader>
           <CardTitle>Listado</CardTitle>
-          <CardDescription>Presupuestos con lead, fechas y estado</CardDescription>
+          <CardDescription>
+            {leadId ? "Presupuestos de este lead" : "Presupuestos con lead, fechas y estado"}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <PresupuestosTable />
+          <PresupuestosTable leadId={leadId} />
         </CardContent>
       </Card>
     </div>

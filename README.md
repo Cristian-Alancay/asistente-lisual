@@ -1,4 +1,4 @@
-# Asistente Lisual
+# Assistant Cristian Alancay
 
 Asistente personal web para gestión de ventas, operaciones y experiencia al cliente.
 

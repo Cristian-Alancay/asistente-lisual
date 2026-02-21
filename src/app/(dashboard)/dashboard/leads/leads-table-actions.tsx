@@ -15,7 +15,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { MoreHorizontal, Pencil, Trash2, FileText } from "lucide-react";
 import { LeadForm } from "@/components/forms/lead-form";
 import { updateLead, deleteLead } from "@/lib/actions/leads";
 import { useRole } from "@/components/dashboard/role-provider";
@@ -30,6 +31,8 @@ type Lead = {
   canal_origen: string;
   estado: string;
   presupuesto_estimado: number | null;
+  presupuesto_estimado_moneda?: string | null;
+  link_reunion: string | null;
   necesidad: string | null;
   fecha_decision_estimada: string | null;
   notas: string | null;
@@ -49,15 +52,22 @@ export function LeadsTableActions({ lead }: { lead: Lead }) {
     canal_origen: lead.canal_origen as LeadFormData["canal_origen"],
     estado: lead.estado as LeadFormData["estado"],
     presupuesto_estimado: lead.presupuesto_estimado ?? undefined,
+    presupuesto_estimado_moneda: (lead.presupuesto_estimado_moneda as LeadFormData["presupuesto_estimado_moneda"]) ?? "ARS",
+    link_reunion: lead.link_reunion ?? "",
     necesidad: lead.necesidad ?? "",
     fecha_decision_estimada: lead.fecha_decision_estimada ?? "",
     notas: lead.notas ?? "",
   };
 
   async function handleUpdate(data: LeadFormData) {
-    await updateLead(lead.id, data);
-    toast.success("Lead actualizado");
-    setEditOpen(false);
+    try {
+      await updateLead(lead.id, data);
+      toast.success("Lead actualizado");
+      setEditOpen(false);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Error al actualizar";
+      toast.error(msg);
+    }
   }
 
   async function handleDelete() {
@@ -76,6 +86,12 @@ export function LeadsTableActions({ lead }: { lead: Lead }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem asChild>
+            <Link href={`/dashboard/presupuestos?lead_id=${lead.id}`}>
+              <FileText className="mr-2 h-4 w-4" />
+              Ver presupuestos
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setEditOpen(true)}>
             <Pencil className="mr-2 h-4 w-4" />
             Editar

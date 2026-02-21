@@ -1,4 +1,4 @@
-# Deploy en Vercel – Asistente Lisual
+# Deploy en Vercel – Assistant Cristian Alancay
 
 Proyecto **unificado en la raíz**: todo está en la raíz del repo, no hay subcarpeta. Vercel no requiere Root Directory.
 
@@ -6,7 +6,7 @@ Proyecto **unificado en la raíz**: todo está en la raíz del repo, no hay subc
 
 ## Deploy
 
-1. Conectá el repo **asistente-lisual** a Vercel (si no está conectado).
+1. Conectá el repo **assistant-cristian-alancay** a Vercel (si no está conectado).
 2. Vercel detecta Next.js y usa `npm run build` en la raíz.
 3. **No configures Root Directory** (dejalo vacío o por defecto).
 
@@ -45,7 +45,7 @@ npm run test:all       # Check + tests + build
 ## Estructura (raíz única)
 
 ```
-asistente-lisual/
+assistant-cristian-alancay/
 ├── src/
 │   └── app/
 ├── public/

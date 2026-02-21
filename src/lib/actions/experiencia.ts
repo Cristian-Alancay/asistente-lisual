@@ -44,7 +44,7 @@ export async function updateSolicitudVideo(id: string, updates: { estado?: strin
   const supabase = await createClient();
   const { error } = await supabase
     .from("solicitudes_video")
-    .update({ ...updates, updated_at: new Date().toISOString() })
+    .update(updates)
     .eq("id", id);
   if (error) throw error;
   paths.forEach((p) => revalidatePath(p));
@@ -83,7 +83,7 @@ export async function marcarRevisionRealizada(id: string) {
   const supabase = await createClient();
   const { error } = await supabase
     .from("revisiones")
-    .update({ realizada_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .update({ realizada_at: new Date().toISOString() })
     .eq("id", id);
   if (error) throw error;
   paths.forEach((p) => revalidatePath(p));
@@ -122,7 +122,7 @@ export async function activarIncentivoReferencia(id: string) {
   const supabase = await createClient();
   const { error } = await supabase
     .from("referencias")
-    .update({ incentivo_activado_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .update({ incentivo_activado_at: new Date().toISOString() })
     .eq("id", id);
   if (error) throw error;
   paths.forEach((p) => revalidatePath(p));

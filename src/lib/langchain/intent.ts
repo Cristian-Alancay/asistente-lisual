@@ -30,7 +30,7 @@ export const IntentSchema = z.object({
 
 export type IntentResult = z.infer<typeof IntentSchema>;
 
-const SYSTEM_PROMPT = `Eres un clasificador de intenciones para un asistente de negocio (Lisual).
+const SYSTEM_PROMPT = `Eres un clasificador de intenciones para un asistente de negocio (Assistant Cristian Alancay).
 Clasifica el mensaje del usuario en UNA de estas intenciones:
 - crear_lead: quiere dejar datos para que lo contacten, registrarse, ser prospecto.
 - consultar_presupuesto: pregunta por precios, cotización, presupuesto.

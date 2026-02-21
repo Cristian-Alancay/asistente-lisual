@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useFetchList } from "./use-fetch-list";
 
 type Lead = {
   id: string;
@@ -11,14 +11,6 @@ type Lead = {
 };
 
 export function useLeads() {
-  const [leads, setLeads] = useState<Lead[]>([]);
-
-  useEffect(() => {
-    fetch("/api/leads")
-      .then((r) => r.json())
-      .then(setLeads)
-      .catch(() => setLeads([]));
-  }, []);
-
-  return leads;
+  const { data } = useFetchList<Lead>("/api/leads");
+  return data;
 }

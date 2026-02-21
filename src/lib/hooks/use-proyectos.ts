@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { useFetchList } from "./use-fetch-list";
 
 type Proyecto = {
   id: string;
@@ -8,14 +9,6 @@ type Proyecto = {
 };
 
 export function useProyectos() {
-  const [proyectos, setProyectos] = useState<Proyecto[]>([]);
-
-  useEffect(() => {
-    fetch("/api/proyectos")
-      .then((r) => r.json())
-      .then((data) => setProyectos(data?.map((p: { id: string; nombre: string }) => ({ id: p.id, nombre: p.nombre })) ?? []))
-      .catch(() => setProyectos([]));
-  }, []);
-
-  return proyectos;
+  const { data } = useFetchList<Proyecto>("/api/proyectos");
+  return useMemo(() => data.map((p) => ({ id: p.id, nombre: p.nombre })), [data]);
 }

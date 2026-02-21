@@ -47,7 +47,7 @@ export async function toggleTareaCompletada(id: string) {
 
   const { error } = await supabase
     .from("tareas")
-    .update({ completada: !row.completada, updated_at: new Date().toISOString() })
+    .update({ completada: !row.completada })
     .eq("id", id);
   if (error) throw error;
   paths.forEach((p) => revalidatePath(p));

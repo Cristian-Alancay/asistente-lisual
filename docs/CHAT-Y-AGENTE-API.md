@@ -1,6 +1,6 @@
 # Chat y Agente – Cuándo usar cada API
 
-El proyecto tiene dos formas de “chat con IA” que tocan datos de Lisual. Resumen de uso.
+El proyecto tiene dos formas de “chat con IA” que tocan datos de Assistant Cristian Alancay. Resumen de uso.
 
 ---
 
@@ -39,7 +39,7 @@ El proyecto tiene dos formas de “chat con IA” que tocan datos de Lisual. Res
 
 ## WhatsApp (webhook)
 
-- El webhook invoca **lisualAgent.invoke()** directamente en el servidor (no llama a `/api/agent` por HTTP).
+- El webhook invoca **trabajoAgent.invoke()** directamente en el servidor (no llama a `/api/agent` por HTTP).
 - **Flujo:** para cada mensaje (o imagen) entrante se llama al agente completo (tools + visión). Si el agente falla, se hace fallback a `detectIntent` + `chat()` o creación de lead.
 - **Multimedia en backend:** las fotos se normalizan en el servidor con `prepareImageForAgent` (ver `src/lib/langchain/multimedia.ts`). Acepta base64, data URL o URL pública; se convierte a data URL y se aplica límite de tamaño (4 MB). Evolution puede enviar imagen en base64 (`webhook_base64: true`) o URL; en ambos casos el backend la prepara para el modelo de visión.
 - Respuesta al usuario por Evolution API (`sendWhatsAppText`).

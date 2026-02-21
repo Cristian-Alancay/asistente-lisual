@@ -28,7 +28,7 @@ export function ClientesTable() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/clientes")
+    fetch("/api/clientes", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => (Array.isArray(data) ? data : []))
       .then(setClientes)
@@ -61,7 +61,7 @@ export function ClientesTable() {
         <TableRow>
           <TableHead>Nombre</TableHead>
           <TableHead>Empresa</TableHead>
-          <TableHead className="hidden sm:table-cell">ID Lisual Pro</TableHead>
+          <TableHead className="hidden sm:table-cell">ID Pro</TableHead>
           <TableHead className="text-right">Acciones</TableHead>
         </TableRow>
       </TableHeader>

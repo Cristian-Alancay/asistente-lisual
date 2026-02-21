@@ -236,7 +236,7 @@ export const analyzeImage = tool(
   }
 );
 
-export const lisualTools = [
+export const trabajoTools = [
   listLeads,
   searchLeads,
   createLead,

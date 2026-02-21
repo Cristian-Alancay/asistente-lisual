@@ -4,12 +4,13 @@ import {
   marcarSeguimientoEjecutado,
 } from "@/lib/actions/seguimientos";
 import { sendWhatsAppText } from "@/lib/evolution";
+import { cacheHeaders } from "@/lib/api-headers";
 
 const MENSAJES: Record<string, string> = {
-  d3: "Hola! Te contactamos de Lisual. Hace 3 días te enviamos un presupuesto. ¿Podemos ayudarte con alguna consulta?",
-  d7: "Hola! Te escribimos de Lisual. Hace una semana te enviamos un presupuesto. ¿Tenés alguna duda o querés que lo revisemos juntos?",
+  d3: "Hola! Te contactamos de Assistant Cristian Alancay. Hace 3 días te enviamos un presupuesto. ¿Podemos ayudarte con alguna consulta?",
+  d7: "Hola! Te escribimos de Assistant Cristian Alancay. Hace una semana te enviamos un presupuesto. ¿Tenés alguna duda o querés que lo revisemos juntos?",
   pre_vencimiento:
-    "Hola! Te recordamos de Lisual que tu presupuesto vence pronto. Si tenés consultas o querés concretar, estamos para ayudarte.",
+    "Hola! Te recordamos de Assistant Cristian Alancay que tu presupuesto vence pronto. Si tenés consultas o querés concretar, estamos para ayudarte.",
 };
 
 /**
@@ -21,7 +22,10 @@ const MENSAJES: Record<string, string> = {
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401, headers: cacheHeaders.private() }
+    );
   }
 
   try {
@@ -30,10 +34,10 @@ export async function GET(request: NextRequest) {
       pendientes = await getSeguimientosPendientes(true);
     } catch (e) {
       console.error("[cron/seguimientos] getSeguimientosPendientes:", e);
-      return NextResponse.json(
-        { error: "SUPABASE_SERVICE_ROLE_KEY required or DB error" },
-        { status: 500 }
-      );
+    return NextResponse.json(
+      { error: "SUPABASE_SERVICE_ROLE_KEY required or DB error" },
+      { status: 500, headers: cacheHeaders.private() }
+    );
     }
 
     let processed = 0;
@@ -56,9 +60,15 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ok: true, processed });
+    return NextResponse.json(
+      { ok: true, processed },
+      { headers: cacheHeaders.private() }
+    );
   } catch (error) {
     console.error("[cron/seguimientos]", error);
-    return NextResponse.json({ error: "Cron failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Cron failed" },
+      { status: 500, headers: cacheHeaders.private() }
+    );
   }
 }

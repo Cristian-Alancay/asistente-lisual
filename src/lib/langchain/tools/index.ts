@@ -6,5 +6,5 @@ export {
   listPresupuestos,
   ocrImage,
   analyzeImage,
-  lisualTools,
-} from "./lisual-tools";
+  trabajoTools,
+} from "./trabajo-tools";

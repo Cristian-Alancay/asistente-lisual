@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   CommandDialog,
   CommandEmpty,
@@ -11,29 +11,38 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { searchGlobal, type SearchResult } from "@/lib/actions/search";
-import { User, Building2, FileText, FolderKanban } from "lucide-react";
+import { User, Building2, FileText, FolderKanban, ClipboardList, Calendar, StickyNote } from "lucide-react";
+
+/** Contexto según ruta: personal = Cristian Alancay; trabajo = laboral */
+const getContexto = (pathname: string): "trabajo" | "personal" =>
+  pathname.startsWith("/dashboard/personal") ? "personal" : "trabajo";
 
 export function GlobalSearch() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const contexto = getContexto(pathname ?? "");
+
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const router = useRouter();
-
-  const runSearch = useCallback(async (q: string) => {
-    if (!q || q.trim().length < 2) {
-      setResults([]);
-      return;
-    }
-    setLoading(true);
-    try {
-      const data = await searchGlobal(q);
-      setResults(data);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const runSearch = useCallback(
+    async (q: string) => {
+      if (!q || q.trim().length < 2) {
+        setResults([]);
+        return;
+      }
+      setLoading(true);
+      try {
+        const data = await searchGlobal(q, contexto);
+        setResults(data);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [contexto]
+  );
 
   useEffect(() => {
     const t = setTimeout(() => runSearch(query), 200);
@@ -79,14 +88,20 @@ export function GlobalSearch() {
           if (!o) setQuery("");
         }}
         title="Buscar"
-        description="Buscar leads y clientes"
+        description={contexto === "personal" ? "Buscar tareas, eventos y notas" : "Buscar leads y clientes"}
         commandProps={{
           shouldFilter: false,
           value: query,
           onValueChange: setQuery,
         }}
       >
-        <CommandInput placeholder="Buscar por nombre, empresa o email..." />
+        <CommandInput
+          placeholder={
+            contexto === "personal"
+              ? "Buscar tareas, eventos, notas..."
+              : "Buscar por nombre, empresa o email..."
+          }
+        />
         <CommandList>
           <CommandEmpty>
             {loading ? "Buscando..." : query.trim().length < 2 ? "Escribe al menos 2 caracteres" : "Sin resultados"}
@@ -99,6 +114,9 @@ export function GlobalSearch() {
                   {r.type === "cliente" && <Building2 className="mr-2 h-4 w-4" />}
                   {r.type === "presupuesto" && <FileText className="mr-2 h-4 w-4" />}
                   {r.type === "proyecto" && <FolderKanban className="mr-2 h-4 w-4" />}
+                  {r.type === "tarea" && <ClipboardList className="mr-2 h-4 w-4" />}
+                  {r.type === "evento" && <Calendar className="mr-2 h-4 w-4" />}
+                  {r.type === "nota" && <StickyNote className="mr-2 h-4 w-4" />}
                   <div className="flex flex-col">
                     <span>{r.nombre}</span>
                     {(r.empresa || r.email) && (

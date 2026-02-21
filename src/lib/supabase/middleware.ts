@@ -36,6 +36,23 @@ export async function updateSession(request: NextRequest) {
   const isDashboard =
     pathname.startsWith("/dashboard") || pathname === "/";
 
+  // APIs públicas: no exigen sesión (dolar, webhooks externos, auth, cron con CRON_SECRET)
+  const isPublicApi =
+    pathname === "/api/dolar-oficial" ||
+    pathname.startsWith("/api/webhook/") ||
+    pathname.startsWith("/api/auth/") ||
+    pathname.startsWith("/api/cron/");
+
+  if (pathname.startsWith("/api/") && !isPublicApi && !user) {
+    return NextResponse.json(
+      { error: "No autenticado" },
+      {
+        status: 401,
+        headers: { "Cache-Control": "private, no-store, max-age=0" },
+      }
+    );
+  }
+
   if (!user && isDashboard) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -44,7 +61,7 @@ export async function updateSession(request: NextRequest) {
 
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = "/dashboard/elegir";
     return NextResponse.redirect(url);
   }
 
@@ -84,6 +101,33 @@ export async function updateSession(request: NextRequest) {
       url.pathname = "/dashboard";
       url.searchParams.set("error", "forbidden");
       return NextResponse.redirect(url);
+    }
+  }
+
+  // /dashboard/personal: solo miembros del user_manager "default" (Cristian Alancay)
+  if (user && pathname.startsWith("/dashboard/personal")) {
+    const { data: um } = await supabase
+      .from("user_manager")
+      .select("id")
+      .eq("slug", "default")
+      .limit(1)
+      .single();
+
+    if (um?.id) {
+      const { data: member } = await supabase
+        .from("user_manager_members")
+        .select("user_id")
+        .eq("user_manager_id", um.id)
+        .eq("user_id", user.id)
+        .limit(1)
+        .single();
+
+      if (!member) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/dashboard";
+        url.searchParams.set("error", "personal-forbidden");
+        return NextResponse.redirect(url);
+      }
     }
   }
 

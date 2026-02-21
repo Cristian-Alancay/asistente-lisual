@@ -4,18 +4,80 @@ import { createClient } from "@/lib/supabase/server";
 
 export type SearchResult = {
   id: string;
-  type: "lead" | "cliente" | "presupuesto" | "proyecto";
+  type: "lead" | "cliente" | "presupuesto" | "proyecto" | "tarea" | "evento" | "nota";
   nombre: string;
   empresa?: string | null;
   email?: string | null;
   href: string;
 };
 
-export async function searchGlobal(q: string): Promise<SearchResult[]> {
+/** Contexto: "trabajo" = datos laborales; "personal" = tareas, eventos, notas personales */
+export async function searchGlobal(
+  q: string,
+  contexto: "trabajo" | "personal" = "trabajo"
+): Promise<SearchResult[]> {
   if (!q || q.trim().length < 2) return [];
 
   const term = `%${q.trim()}%`;
   const supabase = await createClient();
+
+  if (contexto === "personal") {
+    const { data: um } = await supabase
+      .from("user_manager")
+      .select("id")
+      .eq("slug", "default")
+      .limit(1)
+      .single();
+    if (!um?.id) return [];
+
+    const [tareasRes, eventosRes, notasRes] = await Promise.all([
+      supabase
+        .from("personal_tareas")
+        .select("id, titulo")
+        .eq("user_manager_id", um.id)
+        .ilike("titulo", term)
+        .limit(5),
+      supabase
+        .from("personal_eventos")
+        .select("id, titulo")
+        .eq("user_manager_id", um.id)
+        .ilike("titulo", term)
+        .limit(5),
+      supabase
+        .from("personal_notas")
+        .select("id, titulo")
+        .eq("user_manager_id", um.id)
+        .ilike("titulo", term)
+        .limit(5),
+    ]);
+
+    const results: SearchResult[] = [];
+    for (const t of tareasRes.data ?? []) {
+      results.push({
+        id: t.id,
+        type: "tarea",
+        nombre: t.titulo ?? "",
+        href: "/dashboard/personal/tareas",
+      });
+    }
+    for (const e of eventosRes.data ?? []) {
+      results.push({
+        id: e.id,
+        type: "evento",
+        nombre: e.titulo ?? "",
+        href: "/dashboard/personal/calendario",
+      });
+    }
+    for (const n of notasRes.data ?? []) {
+      results.push({
+        id: n.id,
+        type: "nota",
+        nombre: n.titulo ?? "",
+        href: "/dashboard/personal/notas",
+      });
+    }
+    return results.slice(0, 8);
+  }
 
   const [leadsNombre, leadsEmpresa, leadsEmail, clientesRes, presupuestosRes, proyectosRes] =
     await Promise.all([

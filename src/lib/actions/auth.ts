@@ -35,7 +35,6 @@ export async function updateProfile(input: UpdateProfileInput) {
       additional_emails: additional_emails,
       phone_1: input.phone_1?.trim() || null,
       phone_2: input.phone_2?.trim() || null,
-      updated_at: new Date().toISOString(),
     })
     .eq("id", user.id);
 
@@ -47,7 +46,7 @@ export async function signIn(email: string, password: string) {
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: error.message };
-  redirect("/dashboard");
+  redirect("/dashboard/elegir");
 }
 
 export async function signUp(email: string, password: string, fullName?: string) {
@@ -58,11 +57,11 @@ export async function signUp(email: string, password: string, fullName?: string)
     options: { data: { full_name: fullName } },
   });
   if (error) return { error: error.message };
-  redirect("/dashboard");
+  redirect("/dashboard/elegir");
 }
 
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/login");
+  redirect("/login?logout=success");
 }

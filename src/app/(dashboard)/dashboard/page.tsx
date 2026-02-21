@@ -1,9 +1,11 @@
 import { Suspense } from "react";
 import { getDashboardStats, getLeadsNegociacion, getSeguimientosDelDia } from "@/lib/actions/dashboard";
+import { getResumenAlertasProactivas } from "@/lib/actions/notificaciones";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { Bell, FileText, Wrench, ClipboardCheck, ChevronRight } from "lucide-react";
 
 async function StatsCards() {
   let stats;
@@ -123,6 +125,141 @@ async function DashboardSeguimientosDia() {
   );
 }
 
+async function AlertasDelDia() {
+  let resumen;
+  try {
+    resumen = await getResumenAlertasProactivas();
+  } catch {
+    resumen = {
+      total: 0,
+      seguimientos: 0,
+      seguimientosHoy: 0,
+      presupuestosVencen: 0,
+      presupuestosVencenHoy: 0,
+      instalaciones: 0,
+      revisiones: 0,
+    };
+  }
+  if (resumen.total === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Bell className="h-4 w-4" />
+            Alertas del día
+          </CardTitle>
+          <CardDescription>Resumen de seguimientos, presupuestos e instalaciones</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">No hay alertas pendientes.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+  const items: { label: string; count: number; href: string; icon: React.ReactNode; urgent?: boolean }[] = [
+    {
+      label: "Seguimientos hoy",
+      count: resumen.seguimientosHoy,
+      href: "/dashboard/planificacion",
+      icon: <Bell className="h-4 w-4" />,
+      urgent: resumen.seguimientosHoy > 0,
+    },
+    {
+      label: "Presupuestos vencen hoy",
+      count: resumen.presupuestosVencenHoy,
+      href: "/dashboard/presupuestos",
+      icon: <FileText className="h-4 w-4" />,
+      urgent: resumen.presupuestosVencenHoy > 0,
+    },
+    {
+      label: "Presupuestos por vencer (7 días)",
+      count: resumen.presupuestosVencen - resumen.presupuestosVencenHoy,
+      href: "/dashboard/presupuestos",
+      icon: <FileText className="h-4 w-4" />,
+    },
+    {
+      label: "Instalaciones (7 días)",
+      count: resumen.instalaciones,
+      href: "/dashboard/operaciones",
+      icon: <Wrench className="h-4 w-4" />,
+    },
+    {
+      label: "Revisiones (7 días)",
+      count: resumen.revisiones,
+      href: "/dashboard/experiencia",
+      icon: <ClipboardCheck className="h-4 w-4" />,
+    },
+  ].filter((i) => i.count > 0);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Bell className="h-4 w-4" />
+          Alertas del día
+          <Badge variant="secondary" className="ml-1">
+            {resumen.total}
+          </Badge>
+        </CardTitle>
+        <CardDescription>Resumen de seguimientos, presupuestos e instalaciones</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-2">
+          {items.map((item) => (
+            <li key={item.label}>
+              <Link
+                href={item.href}
+                className="flex items-center justify-between rounded-md border px-3 py-2 text-sm transition-colors hover:bg-muted/50"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">{item.icon}</span>
+                  <span className={item.urgent ? "font-medium" : undefined}>{item.label}</span>
+                  <Badge variant={item.urgent ? "default" : "outline"} className="text-xs">
+                    {item.count}
+                  </Badge>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+}
+
+async function BannerUrgente() {
+  let resumen;
+  try {
+    resumen = await getResumenAlertasProactivas();
+  } catch {
+    return null;
+  }
+  const urgente =
+    (resumen.seguimientosHoy ?? 0) > 0 || (resumen.presupuestosVencenHoy ?? 0) > 0;
+  if (!urgente) return null;
+
+  const partes: string[] = [];
+  if (resumen.seguimientosHoy > 0) partes.push(`${resumen.seguimientosHoy} seguimiento(s) hoy`);
+  if (resumen.presupuestosVencenHoy > 0) partes.push(`${resumen.presupuestosVencenHoy} presupuesto(s) vencen hoy`);
+
+  return (
+    <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
+      <span className="font-medium">Atención: </span>
+      {partes.join(" · ")}
+      <span className="ml-2">
+        <Link href="/dashboard/planificacion" className="underline hover:no-underline">
+          Planificación
+        </Link>
+        {" · "}
+        <Link href="/dashboard/presupuestos" className="underline hover:no-underline">
+          Presupuestos
+        </Link>
+      </span>
+    </div>
+  );
+}
+
 type DashboardPageProps = {
   searchParams: Promise<{ error?: string }>;
 };
@@ -137,6 +274,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           No tienes permiso para acceder a esa sección. Solo los administradores pueden ver Configuración.
         </div>
       )}
+      <Suspense fallback={null}>
+        <BannerUrgente />
+      </Suspense>
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
@@ -154,6 +294,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         }
       >
         <StatsCards />
+      </Suspense>
+
+      <Suspense fallback={<Skeleton className="h-48" />}>
+        <AlertasDelDia />
       </Suspense>
 
       <div className="grid gap-4 md:grid-cols-2">

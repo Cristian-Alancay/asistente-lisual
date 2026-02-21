@@ -1,4 +1,4 @@
-# Evaluación LangChain – Asistente Lisual
+# Evaluación LangChain – Assistant Cristian Alancay
 
 Evaluación del uso de LangChain en el sistema según funcionalidades actuales y recomendaciones de mejora.
 

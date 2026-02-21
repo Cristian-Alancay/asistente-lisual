@@ -1,7 +1,7 @@
 import { createAgent } from "langchain";
-import { lisualTools } from "./tools/lisual-tools";
+import { trabajoTools } from "./tools/trabajo-tools";
 
-const SYSTEM_PROMPT = `Eres el asistente de Lisual: un sistema de gestión de leads, presupuestos, proyectos e instalaciones.
+const SYSTEM_PROMPT = `Eres el Assistant Cristian Alancay: un sistema de gestión de leads, presupuestos, proyectos e instalaciones.
 
 Tienes acceso al sistema a través de herramientas. Debes ser proactivo:
 - Para listar contactos o prospectos recientes: list_leads.
@@ -15,11 +15,11 @@ Puedes recibir mensajes con imágenes: usa ocr_image o analyze_image según conv
 Responde en español, de forma clara y concisa. Después de ejecutar una acción, confirma al usuario qué hiciste y el resultado.`;
 
 /**
- * Agente ReAct con herramientas de Lisual (leads, presupuestos, OCR, análisis de imágenes).
+ * Agente ReAct con herramientas de Assistant Cristian Alancay (leads, presupuestos, OCR, análisis de imágenes).
  * Usa modelo con visión (gpt-4o) para soportar mensajes con imágenes en la conversación.
  */
-export const lisualAgent = createAgent({
+export const trabajoAgent = createAgent({
   model: "openai:gpt-4o",
-  tools: lisualTools,
+  tools: trabajoTools,
   systemPrompt: SYSTEM_PROMPT,
 });

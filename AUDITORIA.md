@@ -1,4 +1,4 @@
-# Auditoría – Asistente Lisual
+# Auditoría – Assistant Cristian Alancay
 
 **Fecha:** 2026-02-17  
 **Scope:** Deploy Vercel, Supabase, código, testing

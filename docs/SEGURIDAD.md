@@ -1,4 +1,4 @@
-# Seguridad - Asistente Lisual
+# Seguridad - Assistant Cristian Alancay
 
 ## Auditoría Supabase (feb 2025)
 

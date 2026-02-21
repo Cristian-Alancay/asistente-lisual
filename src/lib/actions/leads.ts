@@ -1,9 +1,10 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { requireCanEdit } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
+import { withEditAuth } from "./with-edit-auth";
 import type { LeadFormData } from "@/lib/validations/lead";
+
+const PATHS = ["/dashboard", "/dashboard/leads"];
 
 export async function getLeads() {
   const supabase = await createClient();
@@ -23,33 +24,8 @@ export async function getLead(id: string) {
 }
 
 export async function createLead(form: LeadFormData) {
-  const check = await requireCanEdit();
-  if (check.error) throw new Error(check.error);
-  const supabase = await createClient();
-  const { error } = await supabase.from("leads").insert({
-    nombre: form.nombre,
-    empresa: form.empresa || null,
-    email: form.email,
-    telefono: form.telefono || null,
-    canal_origen: form.canal_origen,
-    estado: form.estado,
-    presupuesto_estimado: form.presupuesto_estimado ?? null,
-    necesidad: form.necesidad || null,
-    fecha_decision_estimada: form.fecha_decision_estimada || null,
-    notas: form.notas || null,
-  });
-  if (error) throw error;
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/leads");
-}
-
-export async function updateLead(id: string, form: LeadFormData) {
-  const check = await requireCanEdit();
-  if (check.error) throw new Error(check.error);
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("leads")
-    .update({
+  return withEditAuth(PATHS, async ({ supabase }) => {
+    const { error } = await supabase.from("leads").insert({
       nombre: form.nombre,
       empresa: form.empresa || null,
       email: form.email,
@@ -57,23 +33,42 @@ export async function updateLead(id: string, form: LeadFormData) {
       canal_origen: form.canal_origen,
       estado: form.estado,
       presupuesto_estimado: form.presupuesto_estimado ?? null,
+      presupuesto_estimado_moneda: form.presupuesto_estimado_moneda ?? "ARS",
+      link_reunion: form.link_reunion?.trim() || null,
       necesidad: form.necesidad || null,
       fecha_decision_estimada: form.fecha_decision_estimada || null,
       notas: form.notas || null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id);
-  if (error) throw error;
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/leads");
+    });
+    if (error) throw error;
+  });
+}
+
+export async function updateLead(id: string, form: LeadFormData) {
+  return withEditAuth(PATHS, async ({ supabase }) => {
+    const { error } = await supabase
+      .from("leads")
+      .update({
+        nombre: form.nombre,
+        empresa: form.empresa || null,
+        email: form.email,
+        telefono: form.telefono || null,
+        canal_origen: form.canal_origen,
+        estado: form.estado,
+        presupuesto_estimado: form.presupuesto_estimado ?? null,
+        presupuesto_estimado_moneda: form.presupuesto_estimado_moneda ?? "ARS",
+        link_reunion: form.link_reunion?.trim() || null,
+        necesidad: form.necesidad || null,
+        fecha_decision_estimada: form.fecha_decision_estimada || null,
+        notas: form.notas || null,
+      })
+      .eq("id", id);
+    if (error) throw error;
+  });
 }
 
 export async function deleteLead(id: string) {
-  const check = await requireCanEdit();
-  if (check.error) throw new Error(check.error);
-  const supabase = await createClient();
-  const { error } = await supabase.from("leads").delete().eq("id", id);
-  if (error) throw error;
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/leads");
+  return withEditAuth(PATHS, async ({ supabase }) => {
+    const { error } = await supabase.from("leads").delete().eq("id", id);
+    if (error) throw error;
+  });
 }

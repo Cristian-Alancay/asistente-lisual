@@ -96,7 +96,7 @@ export default function CotizadorPage() {
 
   const leads = useMemo(
     () => (leadsData ?? []).map((l) => ({
-      id: l.id, nombre: l.nombre, empresa: l.empresa,
+      id: l.id, codigo: l.codigo, nombre: l.nombre, empresa: l.empresa,
       email: l.email, telefono: l.telefono,
     })),
     [leadsData],

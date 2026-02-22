@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Users, FileText, Briefcase, Video, Calendar,
+  LayoutDashboard, Users, Briefcase, Video, Calendar,
   Wrench, HeartHandshake, MessageSquare, BarChart3,
   ClipboardList, StickyNote, ChevronDown, Menu, X, Building2, User,
   Calculator, BookOpen,

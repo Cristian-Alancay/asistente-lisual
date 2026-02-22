@@ -14,7 +14,7 @@ type PresupuestoFormProps = {
   onSubmit: (data: PresupuestoFormData) => Promise<void>;
   onCancel?: () => void;
   submitLabel?: string;
-  leads: { id: string; nombre: string; empresa: string | null }[];
+  leads: { id: string; codigo?: string; nombre: string; empresa: string | null }[];
   isEditing?: boolean;
 };
 

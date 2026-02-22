@@ -1,3 +1,4 @@
+/// <reference path="./gis.d.ts" />
 const GIS_SRC = "https://accounts.google.com/gsi/client";
 const SCOPES = [
   "https://www.googleapis.com/auth/spreadsheets",

@@ -5,8 +5,8 @@ import {
   FileText,
   Briefcase,
   Video,
-  Calendar,
   Wrench,
+  Calendar,
   Settings,
   HeartHandshake,
   MessageSquare,
@@ -16,7 +16,6 @@ import {
   User,
   StickyNote,
   BookOpen,
-  Video,
 } from "lucide-react";
 import { LogoutButton } from "@/components/dashboard/logout-button";
 import { setStoredDashboardContext } from "@/lib/contexto-storage";
@@ -198,7 +197,7 @@ export function AppSidebar({ userRole = "usuario" }: AppSidebarProps) {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname.startsWith("/dashboard/instalaciones")} tooltip={ts.installations}>
-                  <Link to="/dashboard/instalaciones"><Video /><span>{ts.installations}</span></Link>
+                  <Link to="/dashboard/instalaciones"><Wrench /><span>{ts.installations}</span></Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>

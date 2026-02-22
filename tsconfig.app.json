@@ -30,6 +30,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"],
+  "include": ["src", "src/lib/google/gis.d.ts"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
 }

@@ -135,20 +135,6 @@ export type Database = {
         Insert: Omit<Database["public"]["Tables"]["seguimientos"]["Row"], "id" | "created_at"> & Partial<Pick<Database["public"]["Tables"]["seguimientos"]["Row"], "id" | "created_at">>
         Update: Partial<Database["public"]["Tables"]["seguimientos"]["Row"]>
       }
-      reuniones: {
-        Row: {
-          id: string
-          lead_id: string
-          fecha_hora: string
-          duracion_min: number | null
-          notas: string | null
-          google_event_id: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: Omit<Database["public"]["Tables"]["reuniones"]["Row"], "id" | "created_at" | "updated_at"> & Partial<Pick<Database["public"]["Tables"]["reuniones"]["Row"], "id" | "created_at" | "updated_at">>
-        Update: Partial<Database["public"]["Tables"]["reuniones"]["Row"]>
-      }
       profiles: {
         Row: {
           id: string

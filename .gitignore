@@ -15,10 +15,6 @@ node_modules
 # testing
 /coverage
 
-# next.js
-.next/
-/out/
-
 # production
 /build
 
@@ -42,3 +38,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Old Next.js project at root (migrated to cristian-assistant/)
+/src/
+/public/
+/scripts/
+/app/
+package.json
+package-lock.json
+next.config.*
+postcss.config.*
+eslint.config.*
+tsconfig.json
+vercel.json
+vitest.config.*
+vitest-setup.*
+components.json
+AUDITORIA.md
+VERCEL.md
+VERIFICACION_BACKEND_MCP.md

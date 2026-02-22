@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "langchain": "npm:langchain@^1",
+    "@langchain/core/": "npm:@langchain/core@^1/",
+    "@langchain/openai": "npm:@langchain/openai@^1",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@^2",
+    "zod": "npm:zod@^4"
+  }
+}

@@ -13,7 +13,7 @@ describe("leadSchema", () => {
     const result = leadSchema.safeParse(validLead);
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.presupuesto_estimado_moneda).toBe("ARS");
+      expect(result.data.presupuesto_estimado_moneda).toBe("USD");
     }
   });
 

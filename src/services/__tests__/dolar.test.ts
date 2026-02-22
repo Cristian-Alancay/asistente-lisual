@@ -1,9 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const MOCK_URL = "https://test.supabase.co/functions/v1/dolar";
+const DOLAR_API = "https://dolarapi.com/v1/dolares/oficial";
 
 beforeEach(() => {
-  vi.stubEnv("VITE_SUPABASE_URL", "https://test.supabase.co");
   vi.restoreAllMocks();
 });
 
@@ -17,7 +16,7 @@ describe("dolar service", () => {
     const { getDolarOficial } = await import("@/services/dolar");
     const result = await getDolarOficial();
 
-    expect(globalThis.fetch).toHaveBeenCalledWith(MOCK_URL);
+    expect(globalThis.fetch).toHaveBeenCalledWith(DOLAR_API);
     expect(result).toEqual({ venta: 1050, compra: 1000 });
   });
 
